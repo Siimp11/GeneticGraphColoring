@@ -1,5 +1,6 @@
 package pl.edu.agh.gcp;
 
+
 /**
  * Klasa abstrakcyjna algorytmu generycznego - wzorzec strategii
  * 
@@ -55,4 +56,6 @@ public abstract class GeneticAlgorithm {
 	}
 	postProcess();
     }
+    
+    
 }

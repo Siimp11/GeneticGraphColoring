@@ -1,2 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile 'net.sf.jung:jung-graph-impl:2.0.1'
+}

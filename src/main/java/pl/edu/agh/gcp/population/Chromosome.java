@@ -1,8 +1,16 @@
 package pl.edu.agh.gcp.population;
 
 public class Chromosome {
-    /*
-     *  kolorowanie grafu
-     *  int ocena - proponuje wymyslic funkcje ktora zawsze zwraca wartosc nieujemna a ocena==-1 oznacza ze jeszcze nie został oceniony. Myśle że będzie ok
+    /**
+     * ocena kolorowania grafu. Zawsze >=0, a -1 ozncza ze jeszcze nie została obliczon
      */
+    int fitness = -1;
+    
+    public boolean isCounted(){
+	return fitness>=0;
+    }
+    
+    public void setFitness(int fitness){
+	this.fitness = fitness;
+    }
 }
