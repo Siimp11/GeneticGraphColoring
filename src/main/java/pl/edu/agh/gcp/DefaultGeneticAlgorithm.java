@@ -1,6 +1,5 @@
 package pl.edu.agh.gcp;
 
-
 /**
  * Klasa abstrakcyjna algorytmu generycznego - wzorzec strategii
  * 
@@ -8,12 +7,18 @@ package pl.edu.agh.gcp;
  * @version 1.0
  *
  */
-public abstract class GeneticAlgorithm {
+public abstract class DefaultGeneticAlgorithm implements GenericAlgorithm {
+
+    /**
+     * Ewentualny preprocesing (domyślnie pusta implementacja)
+     */
+    protected void preProcess() {
+    }
 
     /**
      * Generuje populację początkową
      */
-    protected abstract void startingPopulation();
+    protected abstract void startPopulation();
 
     /**
      * Warunek stopu
@@ -44,10 +49,11 @@ public abstract class GeneticAlgorithm {
     }
 
     /**
-     * Działanie algorytmu generycznego
+     * {@inheritDoc}
      */
+    @Override
     public final void gaRun() {
-	startingPopulation();
+	startPopulation();
 	fitnessFunction();
 	while (!breakCondition()) {
 	    crossover();
@@ -56,6 +62,5 @@ public abstract class GeneticAlgorithm {
 	}
 	postProcess();
     }
-    
-    
+
 }
