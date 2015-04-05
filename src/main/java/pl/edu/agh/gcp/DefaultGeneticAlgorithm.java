@@ -53,6 +53,7 @@ public abstract class DefaultGeneticAlgorithm implements GenericAlgorithm {
      */
     @Override
     public final void gaRun() {
+	preProcess();
 	startPopulation();
 	fitnessFunction();
 	while (!breakCondition()) {

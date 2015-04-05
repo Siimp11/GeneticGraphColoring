@@ -108,20 +108,17 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
     private ExecutorService taskExecutor;
     private CompletionService<Chromosome> taskCompletionService;
 
-    public GenericGraphColoring(Graph<Object, Object> graph, int populationSize, int iterationsLimit, int badEdgeWeight, int colorsUsedWeight,
-	    int numberOfThreads) {
+    public GenericGraphColoring(Graph<Object, Object> graph, int populationSize, int iterationsLimit, int badEdgeWeight, int colorsUsedWeight) {
 	this.graph = graph;
 
 	this.populationSize = populationSize;
 	this.badEdgeWeight = badEdgeWeight;
 	this.colorsUsedWeight = colorsUsedWeight;
 	this.iterationsLimit = iterationsLimit;
-	taskExecutor = Executors.newFixedThreadPool(numberOfThreads);
-	taskCompletionService = new ExecutorCompletionService<Chromosome>(taskExecutor);
     }
 
     public GenericGraphColoring(Graph<Object, Object> graph) {
-	this(graph, 100, 20000, 5, 2, Runtime.getRuntime().availableProcessors());
+	this(graph, 100, 30000, 5, 2);
     }
 
     @Override
@@ -137,6 +134,9 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		colorLimit = tmp;
 	}
 	colorLimit += 1;
+	
+	taskExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	taskCompletionService = new ExecutorCompletionService<Chromosome>(taskExecutor);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
     @Override
     protected void crossover() {
-	int taskCounter = 10;
+	int taskCounter = populationSize;
 	Chromosome[] childs = new Chromosome[taskCounter];
 	for (int i = 0; i < taskCounter; i++) {
 	    taskCompletionService.submit(new Crossover());
@@ -190,9 +190,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		e.printStackTrace();
 	    }
 	}
-	for (int i = 0; i < taskCounter; i++) {
-	    population.remove(random.nextInt(populationSize - i));
-	}
+	population=new Population(populationSize);
 	for (int i = 0; i < taskCounter; i++) {
 	    population.add(childs[i]);
 	}
@@ -206,7 +204,19 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
     @Override
     protected void postProcess() {
-	// TODO Auto-generated method stub
+	int index=0;
+	int min=population.get(0).getFitness();
+	int tmp;
+	for(int i=1;i<populationSize;i++){
+	    tmp=population.get(i).getFitness();
+	    if(tmp<min){
+		min=tmp;
+		index=i;
+	    }
+	}
+	Chromosome ch = population.get(index);
+	System.out.println("Best child found: fitness="+min+" colorsUsed="+ch.getColors()+" badEdges="+ch.getBadEdges()+" coloring="+Arrays.toString(ch.getColoringTab()));
+	clean();
     }
 
     private int fitness(Chromosome ch) {
@@ -245,9 +255,6 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	for (int i = split1; i <= split2; i++) {
 	    child.addColoring(i, parent2.get(i));
 	}
-	System.out.println("Parent1: " + Arrays.toString(parent1.getColoringTab()) + "fitness: " + parent1.getFitness() + "\nParent2: "
-		+ Arrays.toString(parent2.getColoringTab()) + "fitness: " + parent2.getFitness() + "\nSplit1: " + split1 + " Split2: " + split2
-		+ "\nChild: " + Arrays.toString(child.getColoringTab()));
 	return child;
     }
 
@@ -279,6 +286,10 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	ch.setBadEdges(badEdges);
 	return badEdges;
     }
+    
+    private void clean(){
+	taskExecutor.shutdown();
+    }
 
     public static void main(String[] args) {
 	Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
@@ -287,12 +298,12 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	    if (i != 0)
 		graph.addEdge(Integer.valueOf(i), Integer.valueOf(i), Integer.valueOf(0));
 	}
-	GenericGraphColoring gcp = new GenericGraphColoring(graph);
-	gcp.preProcess();
-	gcp.startPopulation();
-	gcp.fitnessFunction();
-	Chromosome ch = gcp.crossoverFunction();
-	System.out.println("fitness: " + gcp.fitness(ch));
+	System.out.println("Processors used: "+Runtime.getRuntime().availableProcessors());
+	long start = System.currentTimeMillis();
+	GenericGraphColoring gcp = new GenericGraphColoring(graph, 1000, 200, 5, 2);
+	gcp.gaRun();
+	long time = System.currentTimeMillis()-start;
+	System.out.println("Time: "+(time/1000)+"s");
     }
 
 }
