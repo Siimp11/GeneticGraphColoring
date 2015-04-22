@@ -30,7 +30,7 @@ public abstract class DefaultGeneticAlgorithm implements GenericAlgorithm {
     /**
      * Funkcja oceny osobników populacji
      */
-    protected abstract void fitnessFunction();
+    protected abstract void fitness();
 
     /**
      * Krzyżowanie
@@ -52,14 +52,14 @@ public abstract class DefaultGeneticAlgorithm implements GenericAlgorithm {
      * {@inheritDoc}
      */
     @Override
-    public final void gaRun() {
+    public final void run() {
 	preProcess();
 	startPopulation();
-	fitnessFunction();
+	fitness();
 	while (!breakCondition()) {
 	    crossover();
 	    mutate();
-	    fitnessFunction();
+	    fitness();
 	}
 	postProcess();
     }

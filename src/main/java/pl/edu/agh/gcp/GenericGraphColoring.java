@@ -10,8 +10,16 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import pl.edu.agh.gcp.crossover.Crossover;
+import pl.edu.agh.gcp.crossover.DefaultCrossover;
+import pl.edu.agh.gcp.mutator.EmptyMutator;
+import pl.edu.agh.gcp.mutator.Mutator;
+import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
+import pl.edu.agh.gcp.parentSelector.ParentSelector;
 import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
+import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
+import pl.edu.agh.gcp.resultSelector.ResultSelector;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
@@ -30,16 +38,16 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
      * @author Daniel Tyka
      * @version 1.0
      */
-    private class CountFitness implements Callable<Chromosome> {
+    private class DoCountFitness implements Callable<Chromosome> {
 	private Chromosome ch;
 
-	public CountFitness(Chromosome ch) {
+	public DoCountFitness(Chromosome ch) {
 	    this.ch = ch;
 	}
 
 	@Override
 	public Chromosome call() throws Exception {
-	    ch.setFitness(GenericGraphColoring.this.fitness(ch));
+	    GenericGraphColoring.this.fitnessFunction(ch);
 	    return null;
 	}
 
@@ -51,7 +59,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
      * @author Daniel Tyka
      * @version 1.0
      */
-    private class Crossover implements Callable<Chromosome> {
+    private class DoCrossover implements Callable<Chromosome> {
 
 	@Override
 	public Chromosome call() throws Exception {
@@ -59,27 +67,79 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 
     }
+    
+    /**
+     * Klasa wewnetrzna do wielowątkowej mutacji
+     * @author Daniel Tyka
+     * @version 1.0
+     */
+    private class DoMutate implements Callable<Chromosome>{
+	private Chromosome ch;
+
+	public DoMutate(Chromosome ch) {
+	    this.ch = ch;
+	}
+
+	@Override
+	public Chromosome call() throws Exception {
+	    properties.mutator.mutateFunction(ch, GenericGraphColoring.this.graph);
+	    return null;
+	}
+	
+    }
 
     /**
-     * Wielkość populacji
+     * Klasa zbierajaca do kupy wszystkie opcje algorytmu
+     * @author Daniel Tyka
+     * @version 1.0
      */
-    private int populationSize;
+    private static class AlgorithmProperties{
+	/**
+	     * Wielkość populacji
+	     */
+	    public int populationSize=500;
+	    /**
+	     * Waga krawędzi łączących wierzchołki o takim samym kolorze - funkcja oceniająca chromosomy
+	     */
+	    public int badEdgeWeight=5;
+	    /**
+	     * Waga ilości użytych kolorów - funkcja oceniająca chromosomy
+	     */
+	    public int colorsUsedWeight=2;
+	    /**
+	     * Limit iteracji
+	     */
+	    public int iterationsLimit=200;
+	    /**
+	     * Ilość wątków
+	     */
+	    public int threads = Runtime.getRuntime().availableProcessors();  
+	    /**
+	     * ParentSelector do wybierania rodziców nasępnego chromosomu
+	     */
+	    public ParentSelector parentSelector = new DefaultParentSelector();
+	    /**
+	     * Crossover do tworzenia kolejnych potomkow rodziców
+	     */
+	    public Crossover crossover = new DefaultCrossover();
+	    /**
+	     * Mutator to mutowania chromosomow
+	     */
+	    public Mutator mutator = new EmptyMutator();
+	    /**
+	     * ResultSelector do wybierania wyniku
+	     */
+	    public ResultSelector resultSelector = new DefaultResultSelector();
+    }
+    
+    /**
+     * Opcje algorytmu
+     */
+    private AlgorithmProperties properties = new AlgorithmProperties();
     /**
      * Limit ilości użytych kolorów (numeracja kolorów od 0)
      */
     private int colorLimit = 0;
-    /**
-     * Waga krawędzi łączących wierzchołki o takim samym kolorze - funkcja oceniająca chromosomy
-     */
-    private int badEdgeWeight;
-    /**
-     * Waga ilości użytych kolorów - funkcja oceniająca chromosomy
-     */
-    private int colorsUsedWeight;
-    /**
-     * Limit iteracji
-     */
-    private int iterationsLimit;
     /**
      * Licznik iteracji
      */
@@ -101,26 +161,26 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
      * ilość wierzchołków grafu
      */
     private int vertexCount;
-
+    /**
+     * Populacja chromosomów
+     */
     private Population population;
 
     private Random random = new Random();
     private ExecutorService taskExecutor;
     private CompletionService<Chromosome> taskCompletionService;
 
-    public GenericGraphColoring(Graph<Object, Object> graph, int populationSize, int iterationsLimit, int badEdgeWeight, int colorsUsedWeight) {
-	this.graph = graph;
-
-	this.populationSize = populationSize;
-	this.badEdgeWeight = badEdgeWeight;
-	this.colorsUsedWeight = colorsUsedWeight;
-	this.iterationsLimit = iterationsLimit;
-    }
-
+    /**
+     * Konstruktor
+     * @param graph na którym będzie działał algorytm
+     */
     public GenericGraphColoring(Graph<Object, Object> graph) {
-	this(graph, 100, 30000, 5, 2);
+	this.graph = graph;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void preProcess() {
 	vertex = graph.getVertices().toArray();
@@ -135,14 +195,17 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 	colorLimit += 1;
 	
-	taskExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	taskExecutor = Executors.newFixedThreadPool(properties.threads);
 	taskCompletionService = new ExecutorCompletionService<Chromosome>(taskExecutor);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void startPopulation() {
-	population = new Population(populationSize);
-	for (int count = 0; count < populationSize; count++) {
+	population = new Population(properties.populationSize);
+	for (int count = 0; count < properties.populationSize; count++) {
 	    Chromosome ch = new Chromosome(vertexCount);
 	    for (int i = 0; i < vertexCount; i++) {
 		ch.addColoring(i, random.nextInt(colorLimit));
@@ -151,18 +214,24 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean breakCondition() {
 	iterationsCounter++;
-	return iterationsCounter > iterationsLimit;
+	return iterationsCounter > properties.iterationsLimit;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void fitnessFunction() {
+    protected void fitness() {
 	int taskCounter = 0;
 	for (Chromosome ch : population) {
 	    if (!ch.isCounted()) {
-		taskCompletionService.submit(new CountFitness(ch));
+		taskCompletionService.submit(new DoCountFitness(ch));
 		taskCounter++;
 	    }
 	}
@@ -176,12 +245,15 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void crossover() {
-	int taskCounter = populationSize;
+	int taskCounter = properties.populationSize;
 	Chromosome[] childs = new Chromosome[taskCounter];
 	for (int i = 0; i < taskCounter; i++) {
-	    taskCompletionService.submit(new Crossover());
+	    taskCompletionService.submit(new DoCrossover());
 	}
 	for (int i = 0; i < taskCounter; i++) {
 	    try {
@@ -190,74 +262,76 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		e.printStackTrace();
 	    }
 	}
-	population=new Population(populationSize);
+	population=new Population(properties.populationSize);
 	for (int i = 0; i < taskCounter; i++) {
 	    population.add(childs[i]);
 	}
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void mutate() {
-	// TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void postProcess() {
-	int index=0;
-	int min=population.get(0).getFitness();
-	int tmp;
-	for(int i=1;i<populationSize;i++){
-	    tmp=population.get(i).getFitness();
-	    if(tmp<min){
-		min=tmp;
-		index=i;
+	int taskCounter = 0;
+	for (Chromosome ch : population) {
+	    if (properties.mutator.mutate(ch)) {
+		taskCompletionService.submit(new DoMutate(ch));
+		taskCounter++;
 	    }
 	}
-	Chromosome ch = population.get(index);
-	System.out.println("Best child found: fitness="+min+" colorsUsed="+ch.getColors()+" badEdges="+ch.getBadEdges()+" coloring="+Arrays.toString(ch.getColoringTab()));
+	while (taskCounter > 0) {
+	    try {
+		taskCompletionService.take();
+	    } catch (InterruptedException e) {
+		e.printStackTrace();
+	    }
+	    taskCounter--;
+	}
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void postProcess() {
+	Chromosome ch = properties.resultSelector.selectResult(population);
+	System.out.println("Best child found: fitness="+ch.getFitness()+" colorsUsed="+ch.getColors()+" badEdges="+ch.getBadEdges()+" coloring="+Arrays.toString(ch.getColoringTab()));
 	clean();
     }
-
-    private int fitness(Chromosome ch) {
-	return badEdgeWeight * countBadEdges(ch) + colorsUsedWeight * countColors(ch);
+    
+    /**
+     * Funkcja czyszcząca
+     */
+    private void clean(){
+	taskExecutor.shutdown();
     }
 
+    /**
+     * Funkcja do obliczenia przystosowania jednego Chromosomu.
+     * @param ch - chromosom dla którego trzeba obliczyć przystosowanie
+     */
+    private void fitnessFunction(Chromosome ch) {
+	int fit = properties.badEdgeWeight * countBadEdges(ch) + properties.colorsUsedWeight * countColors(ch);
+	ch.setFitness(fit);
+    }
+
+    /**
+     * Funkcja która wybiera rodziców uzywając {@link ParentSelector} i generuje potomka używając {@link Crossover}
+     * @see #setParentSelector(ParentSelector)
+     * @see #setCrossover(Crossover)
+     * @return wygenerowany potomek
+     */
     private final Chromosome crossoverFunction() {
-	Chromosome[] tab = new Chromosome[5];
-	for (int i = 0; i < 5; i++) {
-	    tab[i] = population.get(random.nextInt(populationSize));
-	}
-	Arrays.sort(tab);
-	// Najlepsze chromosomy z wylosowanej grupy. W przypadku gdy wylosuje sie wiecej niz 2 o takim samym prystosowaniu powinno wybrac losowe ale mi sie nie chce pisac tego xD
-	Chromosome parent1 = tab[0];
-	Chromosome parent2 = tab[1];
-	if (random.nextInt(2) == 1) { // Swap or not to swap. That is The Question.
-	    Chromosome tmp = parent1;
-	    parent1 = parent2;
-	    parent2 = tmp;
-	}
-	int split1 = random.nextInt(vertexCount);
-	int split2 = random.nextInt(vertexCount);
-	if (split2 < split1) {
-	    int tmp = split2;
-	    split2 = split1;
-	    split1 = tmp;
-	}
-	Chromosome child = null;
-	try {
-	    child = (Chromosome) parent1.clone();
-	} catch (CloneNotSupportedException e) {
-	}
-	child.setBadEdges(-1);
-	child.setColors(-1);
-	child.setFitness(-1);
-	for (int i = split1; i <= split2; i++) {
-	    child.addColoring(i, parent2.get(i));
-	}
-	return child;
+	Pair<Chromosome> parents = properties.parentSelector.selectParents(population);
+	return properties.crossover.crossoverFunction(parents.getFirst(), parents.getSecond());
     }
 
+    /**
+     * Oblicza ilosc kolorów użytych w chromosomie
+     * @param ch - chromosom dla ktorego mamy obliczyc ilosc kolorów
+     * @return ilość kolorów w chromosomie
+     */
     private final int countColors(Chromosome ch) {
 	int colors = 0;
 	boolean tab[] = new boolean[ch.size()];
@@ -272,6 +346,11 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	return colors;
     }
 
+    /**
+     * Oblicza ilosc złych krawędzi w chromosomie
+     * @param ch - chromosom dla ktorego mamy obliczyc ilosc złych krawędzi
+     * @return ilość złych krawędzi w chromosomie
+     */
     private final int countBadEdges(Chromosome ch) {
 	int badEdges = 0;
 	int index1;
@@ -286,24 +365,91 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	ch.setBadEdges(badEdges);
 	return badEdges;
     }
-    
-    private void clean(){
-	taskExecutor.shutdown();
-    }
 
+    /**
+     * Ustawia parametr - <b>wielkość populacji</b>
+     * @param populationSize
+     */
+    public void setPopulationSize(int populationSize) {
+        properties.populationSize = populationSize;
+    }
+    /**
+     * Ustawia parametr - <b>wagę złych krawędzi</b> do funkcji oceny Chromosomu
+     * @param badEdgeWeight
+     */
+    public void setBadEdgeWeight(int badEdgeWeight) {
+	properties.badEdgeWeight = badEdgeWeight;
+    }
+    /**
+     * Ustawia parametr - <b>wagę ilości uzytych kolorów</b> do funkcji oceny Chromosomu
+     * @param colorsUsedWeight
+     */
+    public void setColorsUsedWeight(int colorsUsedWeight) {
+	properties.colorsUsedWeight = colorsUsedWeight;
+    }
+    /**
+     * Ustawia parametr - <b>limit iteracji</b>
+     * @param iterationsLimit
+     */
+    public void setIterationsLimit(int iterationsLimit) {
+	properties.iterationsLimit = iterationsLimit;
+    }
+    /**
+     * Ustawia parametr - <b>ilość użytych wątków</b>
+     * @param threads
+     */
+    public void setThreads(int threads) {
+	properties.threads = threads;
+    }
+    /**
+     * Ustawia parametr - <b>ParentSelector</b> używany do wybierania rodziców podczas generowania potomków
+     * @see ParentSelector
+     * @param parentSelector
+     */
+    public void setParentSelector(ParentSelector parentSelector){
+	properties.parentSelector=parentSelector;
+    }
+    /**
+     * Ustawia parametr - <b>Crossover</b> używany do generowania potomków
+     * @see Crossover
+     * @param crossover
+     */
+    public void setCrossover(Crossover crossover){
+	properties.crossover=crossover;
+    }
+    /**
+     * Ustawia parametr - <b>Mutator</b> używany mutowania potomków
+     * @see Mutator
+     * @param mutator
+     */
+    public void setMutator(Mutator mutator){
+	properties.mutator=mutator;
+    }
+    /**
+     * Ustawia graf na którym ma działać algorytm
+     * @param graph
+     */
+    public void setGraph(Graph<Object,Object> graph){
+	if(graph==null)
+	    throw new NullPointerException("Graph cannot be null.");
+	this.graph=graph;
+    }
+    
     public static void main(String[] args) {
 	Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
-	for (int i = 0; i < 10; i++) {
-	    graph.addVertex(Integer.valueOf(i));
-	    if (i != 0)
-		graph.addEdge(Integer.valueOf(i), Integer.valueOf(i), Integer.valueOf(0));
+	int n=10;
+	for (int i = 0; i < n; i++) {
+	    graph.addVertex(Integer.valueOf(i));		
 	}
-	System.out.println("Processors used: "+Runtime.getRuntime().availableProcessors());
+	for (int i = 0; i < n; i++) {
+	    for (int j = i+1; j < n; j++) {
+		graph.addEdge(Integer.valueOf(n*i+j), Integer.valueOf(i), Integer.valueOf(j));
+	    }   
+	}
 	long start = System.currentTimeMillis();
-	GenericGraphColoring gcp = new GenericGraphColoring(graph, 1000, 200, 5, 2);
-	gcp.gaRun();
+	GenericGraphColoring gcp = new GenericGraphColoring(graph);
+	gcp.run();
 	long time = System.currentTimeMillis()-start;
 	System.out.println("Time: "+(time/1000)+"s");
     }
-
 }
