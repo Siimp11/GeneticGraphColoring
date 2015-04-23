@@ -82,7 +82,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 	@Override
 	public Chromosome call() throws Exception {
-	    properties.mutator.mutateFunction(ch, GenericGraphColoring.this.graph);
+	    properties.mutator.mutateFunction(ch, GenericGraphColoring.this.graph, GenericGraphColoring.this.vertex, GenericGraphColoring.this.edges);
 	    return null;
 	}
 	
@@ -154,7 +154,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
      */
     private Object[] vertex;
     /**
-     * Zbiór krawędzi grafu
+     * Kolekcja krawędzi grafu
      */
     private Collection<Object> edges;
     /**

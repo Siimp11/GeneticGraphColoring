@@ -1,5 +1,7 @@
 package pl.edu.agh.gcp.mutator;
 
+import java.util.Collection;
+
 import pl.edu.agh.gcp.population.Chromosome;
 import edu.uci.ics.jung.graph.Graph;
 
@@ -23,7 +25,9 @@ public class EmptyMutator implements Mutator {
      * {@inheritDoc}
      */
     @Override
-    public void mutateFunction(Chromosome ch, Graph<Object, Object> graph) {
+    public void mutateFunction(Chromosome chromosome, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges) {
+	// TODO Auto-generated method stub
+	
     }
 
 }

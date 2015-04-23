@@ -58,6 +58,7 @@ public abstract class DefaultGeneticAlgorithm implements GenericAlgorithm {
 	fitness();
 	while (!breakCondition()) {
 	    crossover();
+	    fitness();
 	    mutate();
 	    fitness();
 	}

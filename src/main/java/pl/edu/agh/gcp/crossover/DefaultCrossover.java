@@ -30,9 +30,7 @@ public class DefaultCrossover implements Crossover {
 	    child = (Chromosome) parent1.clone();
 	} catch (CloneNotSupportedException e) {
 	}
-	child.setBadEdges(-1);
-	child.setColors(-1);
-	child.setFitness(-1);
+	child.setFitnessUncounted();
 	for (int i = split1; i <= split2; i++) {
 	    child.addColoring(i, parent2.get(i));
 	}

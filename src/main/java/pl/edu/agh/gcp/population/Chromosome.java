@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /**
  * Reprezentacja pojedynczego chromosomu
+ * 
  * @author Daniel Tyka
  * @version 1.0
  *
@@ -28,7 +29,9 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Konstruktor
-     * @param size - ilośc wierzchołków w grafie
+     * 
+     * @param size
+     *            - ilośc wierzchołków w grafie
      */
     public Chromosome(int size) {
 	coloring = new int[size];
@@ -36,6 +39,7 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Czy funkcja przystosowania została policzona dla tego chromosomu
+     * 
      * @return true or false
      */
     public boolean isCounted() {
@@ -44,14 +48,28 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Ustawia przystosowanie tego chromosomu
+     * 
      * @param fitness
      */
     public void setFitness(int fitness) {
-	this.fitness = fitness;
+	if (fitness < 0)
+	    throw new IllegalArgumentException("Fitness must be >= 0");
+	else
+	    this.fitness = fitness;
+    }
+    
+    /**
+     * Ustawia wartość pól Fitness, Colors oraz BadEdges na -1, co oznacza że nie zostały obliczone.
+     */
+    public void setFitnessUncounted(){
+	fitness=-1;
+	colors=-1;
+	badEdges=-1;
     }
 
     /**
      * Zwraca wartość funkcji przystosowania, -1 w przypadku jeżeli nie zostałą jeszcze obliczona
+     * 
      * @return wartość funkcji przystosowania
      */
     public int getFitness() {
@@ -60,6 +78,7 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Zwraca ilość kolorów, -1 w przypadku jeżeli nie zostały jeszcze policzone
+     * 
      * @return ilość kolorów
      */
     public int getColors() {
@@ -68,14 +87,27 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Ustawia ilośc kolorów w chromosomie
+     * 
      * @param colors
      */
     public void setColors(int colors) {
-	this.colors = colors;
+	if (colors < 0)
+	    throw new IllegalArgumentException("Colors must be >= 0");
+	else
+	    this.colors = colors;
+    }
+    
+    /**
+     * Ustawia pola Fitness oraz Colors na -1, co oznacza że nie zostały policzone
+     */
+    public void setColorsUncounted(){
+	colors=-1;
+	fitness=-1;
     }
 
     /**
      * Zwraca ilość złych krawędzi w chromosomie, -1 w przypadku gdy nie zostały jeszcze policzone
+     * 
      * @return ilość złych krawędzi w chromosomie
      */
     public int getBadEdges() {
@@ -84,14 +116,27 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Ustawia ilość żłych krawędzi
+     * 
      * @param badEdges
      */
     public void setBadEdges(int badEdges) {
-	this.badEdges = badEdges;
+	if (badEdges < 0)
+	    throw new IllegalArgumentException("Bad edges must be >= 0");
+	else
+	    this.badEdges = badEdges;
+    }
+    
+    /**
+     * Ustawia pola Fitness oraz BadEdges na -1, co oznacza że nie zostały policzone
+     */
+    public void setBadEdgesUncounted(){
+	badEdges=-1;
+	fitness=-1;
     }
 
     /**
      * Wstawia kolorowanie danego wierzchołka w grafie
+     * 
      * @param index
      * @param color
      */
@@ -101,6 +146,7 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Wielkość tablicy z kolorowaniem = ilość wierzchołków w grafie
+     * 
      * @return
      */
     public int size() {
@@ -109,6 +155,7 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Zwraca kolor danego wierzchołka w grafie
+     * 
      * @param index
      * @return kolor danego wierzchołka
      */
@@ -118,6 +165,7 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 
     /**
      * Zwraca tablicę z kolorowaniem grafu
+     * 
      * @return tablica z kolorowaniem grafu
      */
     public int[] getColoringTab() {
