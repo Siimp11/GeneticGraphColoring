@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 
 import pl.edu.agh.gcp.crossover.Crossover;
 import pl.edu.agh.gcp.crossover.DefaultCrossover;
+import pl.edu.agh.gcp.mutator.ColourUnifier;
 import pl.edu.agh.gcp.mutator.EmptyMutator;
 import pl.edu.agh.gcp.mutator.Mutator;
 import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
@@ -471,7 +472,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 	public static void main(String[] args) {
 		Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
-		int n = 10;
+		int n = 100;
 		for (int i = 0; i < n; i++) {
 			graph.addVertex(Integer.valueOf(i));
 		}
@@ -482,6 +483,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		}
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(graph);
+		gcp.setMutator(new ColourUnifier());
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");
