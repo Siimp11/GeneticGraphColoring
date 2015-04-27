@@ -10,6 +10,7 @@ import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 public class DimacsParser {
 	private String filename;
 	private Graph<Object, Object> graph;
+	private int vertices;
 	
 	public DimacsParser(String filename) {
 		this.filename = filename;
@@ -49,14 +50,20 @@ public class DimacsParser {
 			String[] data = line.split(" ");
 			if(data.length != 4) throw new Exception("Invalid line: "+line); //TODO nie wiem jaki tu ma byc wyjatek xD Runtime?
 			
-			//TODO
+			vertices = Integer.parseInt(data[2]);
+			
+			for(int i=0; i<vertices; i++){
+				graph.addVertex(Integer.valueOf(i));
+			}
 			return;
 			
 		} else if(line.charAt(0) == 'e') {
 			String[] data = line.split(" ");
 			if(data.length != 3) throw new Exception("Invalid line: "+line); //TODO nie wiem jaki tu ma byc wyjatek xD Runtime?
 			
-			graph.addEdge(new Object(), Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+			int e1 = Integer.parseInt(data[1]);
+			int e2 = Integer.parseInt(data[2]);
+			graph.addEdge(Integer.valueOf(vertices * e1 + e2), Integer.valueOf(e1), Integer.valueOf(e2));
 		}
 	}
 }
