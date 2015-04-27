@@ -498,7 +498,11 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
+		gcp.setPopulationSize(100);
 		gcp.setMutator(new ColourUnifier());
+		gcp.setBadEdgeWeight(5);
+		gcp.setColorsUsedWeight(2);
+		gcp.setIterationsLimit(500);
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");
