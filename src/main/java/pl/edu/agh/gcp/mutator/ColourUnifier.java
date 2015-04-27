@@ -70,7 +70,7 @@ public class ColourUnifier implements Mutator {
 		for (int i = 0; i < colours.length; i++)
 			hasBeenChanged[i] = false;
 		for (int i = 0; i < translator.length; i++) {
-			for (int j = 0; i < hasBeenChanged.length; j++) {
+			for (int j = 0; j < hasBeenChanged.length; j++) {
 				if (translator[i] == chromosome.getColoringTab()[j]
 						&& !hasBeenChanged[j]) {
 					chromosome.getColoringTab()[j] = i;
