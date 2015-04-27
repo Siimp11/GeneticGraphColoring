@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 
 import pl.edu.agh.gcp.crossover.Crossover;
 import pl.edu.agh.gcp.crossover.DefaultCrossover;
+import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColourUnifier;
 import pl.edu.agh.gcp.mutator.EmptyMutator;
 import pl.edu.agh.gcp.mutator.Mutator;
@@ -22,7 +23,6 @@ import pl.edu.agh.gcp.population.Population;
 import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
 import pl.edu.agh.gcp.resultSelector.ResultSelector;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 
 /**
@@ -471,7 +471,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 
 	public static void main(String[] args) {
-		Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
+		/*Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
 		int n = 100;
 		for (int i = 0; i < n; i++) {
 			graph.addVertex(Integer.valueOf(i));
@@ -483,6 +483,21 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		}
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(graph);
+		gcp.setMutator(new ColourUnifier());
+		gcp.run();
+		long time = System.currentTimeMillis() - start;
+		System.out.println("Time: " + (time / 1000) + "s");*/
+		
+		DimacsParser test = new DimacsParser("test.col");
+		
+		try {
+			test.load();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		long start = System.currentTimeMillis();
+		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
 		gcp.setMutator(new ColourUnifier());
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
