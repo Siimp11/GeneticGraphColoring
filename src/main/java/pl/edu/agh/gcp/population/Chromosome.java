@@ -159,7 +159,7 @@ public class Chromosome implements Comparable<Chromosome>, Cloneable {
 	 * @param index
 	 * @return kolor danego wierzchołka
 	 */
-	public Integer get(int index) {
+	public int get(int index) {
 		return coloring[index];
 	}
 

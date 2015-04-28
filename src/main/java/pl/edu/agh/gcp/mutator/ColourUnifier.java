@@ -19,6 +19,19 @@ import edu.uci.ics.jung.graph.Graph;
  *
  */
 public class ColourUnifier implements Mutator {
+	private Random random = new Random();
+	private int chanceNumerator;
+	private int chanceDenominator;
+	
+	/**
+	 * Konstruktor. Szansa na mutacje jest równa chanceNumerator/chanceDenominator
+	 * @param chanceNumerator licznik
+	 * @param chanceDenominator mianownik
+	 */
+	public ColourUnifier(int chanceNumerator, int chanceDenominator) {
+		this.chanceNumerator=chanceNumerator;
+		this.chanceDenominator=chanceDenominator;
+	}
 
 	/**
 	 * Funkcja sprawdzająca, czy należy mutować. Mutacja zachodzi przy pomyślnym losowaniu (szansa 1/2) lub w sytuacji,
@@ -27,7 +40,7 @@ public class ColourUnifier implements Mutator {
 	 */
 	@Override
 	public boolean mutate(Chromosome chromosome) {
-		if (new Random().nextInt(2) == 1 || chromosome.getBadEdges() == 0)
+		if ((random.nextInt(chanceDenominator) < chanceNumerator) || chromosome.getBadEdges() == 0)
 			return true;
 		else
 			return false;

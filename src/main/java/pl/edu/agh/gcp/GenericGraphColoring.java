@@ -21,9 +21,11 @@ import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 import pl.edu.agh.gcp.populationGenerator.PopulationGenerator;
 import pl.edu.agh.gcp.populationGenerator.RandomPopulation;
+import pl.edu.agh.gcp.populationGenerator.UnifiedColorsPopulation;
 import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
 import pl.edu.agh.gcp.resultSelector.ResultSelector;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 
 /**
@@ -197,6 +199,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		Arrays.sort(vertex);
 		vertexCount = vertex.length;
 		edges = graph.getEdges();
+		colorLimit=0;
 		int tmp;
 		for (Object o : vertex) {
 			tmp = graph.getNeighborCount(o);
@@ -346,6 +349,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 			return ch.getColors();
 		int colors = 0;
 		boolean tab[] = new boolean[ch.size()];
+		for(int i=0;i<tab.length;i++)
+			tab[i]=false;
 		for (int i : ch.getColoringTab()) {
 			tab[i] = true;
 		}
@@ -374,7 +379,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 			Pair<Object> vert = graph.getEndpoints(e);
 			index1 = Arrays.binarySearch(vertex, vert.getFirst());
 			index2 = Arrays.binarySearch(vertex, vert.getSecond());
-			if (ch.get(index1) == (ch.get(index2)))
+			if (ch.get(index1)==(ch.get(index2)))
 				badEdges++;
 		}
 		ch.setBadEdges(badEdges);
@@ -476,7 +481,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @see PopulationGenerator
 	 * @param populationGenerator
 	 */
-	public void setPopUlationGenerator(PopulationGenerator populationGenerator){
+	public void setPopulationGenerator(PopulationGenerator populationGenerator){
 		if (populationGenerator == null)
 			throw new NullPointerException("populationGenerator cannot be null.");
 		properties.populationGenerator=populationGenerator;
@@ -495,7 +500,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 	public static void main(String[] args) {
 		/*Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
-		int n = 100;
+		int n = 30;
 		for (int i = 0; i < n; i++) {
 			graph.addVertex(Integer.valueOf(i));
 		}
@@ -507,6 +512,11 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(graph);
 		gcp.setMutator(new ColourUnifier());
+		gcp.setPopulationGenerator(new UnifiedColorsPopulation());
+		gcp.setPopulationSize(500);
+		gcp.setBadEdgeWeight(5);
+		gcp.setColorsUsedWeight(2);
+		gcp.setIterationsLimit(200);
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");*/
@@ -522,7 +532,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
 		gcp.setPopulationSize(500);
-		gcp.setMutator(new ColourUnifier());
+		gcp.setMutator(new ColourUnifier(1,2));
+		//gcp.setPopulationGenerator(new UnifiedColorsPopulation());
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
 		gcp.setIterationsLimit(200);
