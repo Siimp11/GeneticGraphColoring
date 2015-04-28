@@ -2,7 +2,6 @@ package pl.edu.agh.gcp;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -20,6 +19,8 @@ import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
 import pl.edu.agh.gcp.parentSelector.ParentSelector;
 import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
+import pl.edu.agh.gcp.populationGenerator.PopulationGenerator;
+import pl.edu.agh.gcp.populationGenerator.RandomPopulation;
 import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
 import pl.edu.agh.gcp.resultSelector.ResultSelector;
 import edu.uci.ics.jung.graph.Graph;
@@ -134,6 +135,10 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		 * ResultSelector do wybierania wyniku
 		 */
 		public ResultSelector resultSelector = new DefaultResultSelector();
+		/**
+		 * Generator populacji startowej
+		 */
+		public PopulationGenerator populationGenerator = new RandomPopulation();
 	}
 
 	/**
@@ -170,7 +175,6 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 */
 	private Population population;
 
-	private Random random = new Random();
 	private ExecutorService taskExecutor;
 	private CompletionService<Chromosome> taskCompletionService;
 
@@ -210,14 +214,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 */
 	@Override
 	protected void startPopulation() {
-		population = new Population(properties.populationSize);
-		for (int count = 0; count < properties.populationSize; count++) {
-			Chromosome ch = new Chromosome(vertexCount);
-			for (int i = 0; i < vertexCount; i++) {
-				ch.addColoring(i, random.nextInt(colorLimit));
-			}
-			population.add(ch);
-		}
+		population=properties.populationGenerator.generatePopulation(properties.populationSize, vertexCount, colorLimit);
 	}
 
 	/**
@@ -390,6 +387,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param populationSize
 	 */
 	public void setPopulationSize(int populationSize) {
+		if (populationSize < 1)
+			throw new IllegalArgumentException("populationSize cannot be less than 1.");
 		properties.populationSize = populationSize;
 	}
 
@@ -399,6 +398,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param badEdgeWeight
 	 */
 	public void setBadEdgeWeight(int badEdgeWeight) {
+		if (badEdgeWeight < 0)
+			throw new IllegalArgumentException("badEdgeWeight cannot be less than 0.");
 		properties.badEdgeWeight = badEdgeWeight;
 	}
 
@@ -408,6 +409,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param colorsUsedWeight
 	 */
 	public void setColorsUsedWeight(int colorsUsedWeight) {
+		if (colorsUsedWeight < 0)
+			throw new IllegalArgumentException("colorsUsedWeight cannot be less than 0.");
 		properties.colorsUsedWeight = colorsUsedWeight;
 	}
 
@@ -417,6 +420,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param iterationsLimit
 	 */
 	public void setIterationsLimit(int iterationsLimit) {
+		if (iterationsLimit < 0)
+			throw new IllegalArgumentException("iterationsLimit cannot be less than 0.");
 		properties.iterationsLimit = iterationsLimit;
 	}
 
@@ -426,6 +431,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param threads
 	 */
 	public void setThreads(int threads) {
+		if (threads < 1)
+			throw new IllegalArgumentException("threads cannot be less than 1.");
 		properties.threads = threads;
 	}
 
@@ -436,6 +443,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param parentSelector
 	 */
 	public void setParentSelector(ParentSelector parentSelector) {
+		if (parentSelector == null)
+			throw new NullPointerException("parentSelector cannot be null.");
 		properties.parentSelector = parentSelector;
 	}
 
@@ -446,6 +455,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param crossover
 	 */
 	public void setCrossover(Crossover crossover) {
+		if (crossover == null)
+			throw new NullPointerException("Crossover cannot be null.");
 		properties.crossover = crossover;
 	}
 
@@ -456,7 +467,19 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param mutator
 	 */
 	public void setMutator(Mutator mutator) {
+		if (mutator == null)
+			throw new NullPointerException("mutator cannot be null.");
 		properties.mutator = mutator;
+	}
+	/**
+	 * Ustawia parametr - <b>PopulationGenerator</b> używany generowania populacji startowej
+	 * @see PopulationGenerator
+	 * @param populationGenerator
+	 */
+	public void setPopUlationGenerator(PopulationGenerator populationGenerator){
+		if (populationGenerator == null)
+			throw new NullPointerException("populationGenerator cannot be null.");
+		properties.populationGenerator=populationGenerator;
 	}
 
 	/**
@@ -498,11 +521,11 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
-		gcp.setPopulationSize(100);
+		gcp.setPopulationSize(500);
 		gcp.setMutator(new ColourUnifier());
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
-		gcp.setIterationsLimit(500);
+		gcp.setIterationsLimit(200);
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");
