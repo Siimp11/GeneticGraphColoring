@@ -25,9 +25,7 @@ public class EmptyMutator implements Mutator {
      * {@inheritDoc}
      */
     @Override
-    public void mutateFunction(Chromosome chromosome, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges) {
-	// TODO Auto-generated method stub
-	
+    public void mutateFunction(Chromosome chromosome, int colorLimit, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges) {	
     }
 
 }

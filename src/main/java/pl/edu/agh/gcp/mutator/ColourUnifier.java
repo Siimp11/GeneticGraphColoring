@@ -62,7 +62,7 @@ public class ColourUnifier implements Mutator {
 	 * Funkcja mutująca.
 	 */
 	@Override
-	public void mutateFunction(Chromosome chromosome,
+	public void mutateFunction(Chromosome chromosome, int colorLimit,
 			Graph<Object, Object> graph, Object[] vertex,
 			Collection<Object> edges) {
 		int[] translator = new int[chromosome.getColors()];

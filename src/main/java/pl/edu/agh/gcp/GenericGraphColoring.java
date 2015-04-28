@@ -12,20 +12,20 @@ import java.util.concurrent.Executors;
 import pl.edu.agh.gcp.crossover.Crossover;
 import pl.edu.agh.gcp.crossover.DefaultCrossover;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
-import pl.edu.agh.gcp.mutator.ColourUnifier;
+import pl.edu.agh.gcp.mutator.ColorUnifier2;
 import pl.edu.agh.gcp.mutator.EmptyMutator;
 import pl.edu.agh.gcp.mutator.Mutator;
+import pl.edu.agh.gcp.mutator.MutatorsList;
+import pl.edu.agh.gcp.mutator.RandomMutator;
 import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
 import pl.edu.agh.gcp.parentSelector.ParentSelector;
 import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 import pl.edu.agh.gcp.populationGenerator.PopulationGenerator;
 import pl.edu.agh.gcp.populationGenerator.RandomPopulation;
-import pl.edu.agh.gcp.populationGenerator.UnifiedColorsPopulation;
 import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
 import pl.edu.agh.gcp.resultSelector.ResultSelector;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 
 /**
@@ -87,7 +87,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 		@Override
 		public Chromosome call() throws Exception {
-			properties.mutator.mutateFunction(ch, GenericGraphColoring.this.graph, GenericGraphColoring.this.vertex,
+			properties.mutator.mutateFunction(ch,GenericGraphColoring.this.colorLimit, GenericGraphColoring.this.graph, GenericGraphColoring.this.vertex,
 					GenericGraphColoring.this.edges);
 			return null;
 		}
@@ -531,12 +531,16 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
-		gcp.setPopulationSize(500);
-		gcp.setMutator(new ColourUnifier(1,2));
+		
+		MutatorsList mlist = new MutatorsList();
+		mlist.addMutator(new RandomMutator(1, 2));
+		mlist.addMutator(new ColorUnifier2(1, 2));
+		gcp.setMutator(mlist);
 		//gcp.setPopulationGenerator(new UnifiedColorsPopulation());
+		gcp.setPopulationSize(500);
+		gcp.setIterationsLimit(200);
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
-		gcp.setIterationsLimit(200);
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");

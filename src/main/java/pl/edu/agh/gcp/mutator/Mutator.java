@@ -41,5 +41,5 @@ public interface Mutator {
      * @param edges
      *            - kolekcja krawędzi grafu (to co zwróci graph.getEdges(); )
      */
-    public void mutateFunction(Chromosome chromosome, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges);
+    public void mutateFunction(Chromosome chromosome, int colorLimit, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges);
 }
