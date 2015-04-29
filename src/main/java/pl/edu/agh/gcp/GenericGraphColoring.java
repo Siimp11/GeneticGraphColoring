@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 import pl.edu.agh.gcp.crossover.Crossover;
 import pl.edu.agh.gcp.crossover.DefaultCrossover;
+import pl.edu.agh.gcp.crossover.RandomCrossover;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
 import pl.edu.agh.gcp.mutator.EmptyMutator;
@@ -500,7 +501,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 	public static void main(String[] args) {
 		/*Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
-		int n = 30;
+		int n = 130;
 		for (int i = 0; i < n; i++) {
 			graph.addVertex(Integer.valueOf(i));
 		}
@@ -536,7 +537,9 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		mlist.addMutator(new RandomMutator(1, 2));
 		mlist.addMutator(new ColorUnifier2(1, 2));
 		gcp.setMutator(mlist);
+		//gcp.setCrossover(new RandomCrossover());
 		//gcp.setPopulationGenerator(new UnifiedColorsPopulation());
+		//gcp.setParentSelector(new RandomParentSelector());
 		gcp.setPopulationSize(500);
 		gcp.setIterationsLimit(200);
 		gcp.setBadEdgeWeight(5);
