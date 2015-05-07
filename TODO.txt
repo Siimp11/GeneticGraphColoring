@@ -1,7 +1,5 @@
 TODO:
-	- wczytywanie grafu z pliku w formacie .col - DIMACS standard format. Z tego co widziałem jest banalny do parsowania
 	- gui
-	- nie ma jeszcze mutacji
 	- kilka alternatywnych operatorów selekcji, crossowania i mutacji
 	- dokumentacja
 

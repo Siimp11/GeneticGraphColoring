@@ -1,7 +1,9 @@
 package pl.edu.agh.gcp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -11,12 +13,9 @@ import java.util.concurrent.Executors;
 
 import pl.edu.agh.gcp.crossover.Crossover;
 import pl.edu.agh.gcp.crossover.DefaultCrossover;
-import pl.edu.agh.gcp.crossover.RandomCrossover;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
-import pl.edu.agh.gcp.mutator.EmptyMutator;
 import pl.edu.agh.gcp.mutator.Mutator;
-import pl.edu.agh.gcp.mutator.MutatorsList;
 import pl.edu.agh.gcp.mutator.RandomMutator;
 import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
 import pl.edu.agh.gcp.parentSelector.ParentSelector;
@@ -81,14 +80,16 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 */
 	private class DoMutate implements Callable<Chromosome> {
 		private Chromosome ch;
+		private Mutator m;
 
-		public DoMutate(Chromosome ch) {
+		public DoMutate(Chromosome ch, Mutator m) {
 			this.ch = ch;
+			this.m=m;
 		}
 
 		@Override
 		public Chromosome call() throws Exception {
-			properties.mutator.mutateFunction(ch,GenericGraphColoring.this.colorLimit, GenericGraphColoring.this.graph, GenericGraphColoring.this.vertex,
+			m.mutateFunction(ch,GenericGraphColoring.this.colorLimit, GenericGraphColoring.this.graph, GenericGraphColoring.this.vertex,
 					GenericGraphColoring.this.edges);
 			return null;
 		}
@@ -131,9 +132,9 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		 */
 		public Crossover crossover = new DefaultCrossover();
 		/**
-		 * Mutator to mutowania chromosomow
+		 * Lista Mutatorów to mutowania chromosomow - wykonywane po kolei na każdym chromosomie
 		 */
-		public Mutator mutator = new EmptyMutator();
+		public ArrayList<Mutator> mutatorsList = new ArrayList<Mutator>();
 		/**
 		 * ResultSelector do wybierania wyniku
 		 */
@@ -280,20 +281,33 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 */
 	@Override
 	protected void mutate() {
+		Iterator<Mutator> it = properties.mutatorsList.iterator();
+		Mutator mutator;
 		int taskCounter = 0;
-		for (Chromosome ch : population) {
-			if (properties.mutator.mutate(ch)) {
-				taskCompletionService.submit(new DoMutate(ch));
-				taskCounter++;
+		boolean changed = false;
+		
+		while(it.hasNext()){
+			mutator = it.next();
+			taskCounter = 0;
+			changed=false;
+			for (Chromosome ch : population) {
+				if (mutator.mutate(ch)) {
+					changed = true;
+					taskCompletionService.submit(new DoMutate(ch,mutator));
+					taskCounter++;
+				}
 			}
-		}
-		while (taskCounter > 0) {
-			try {
-				taskCompletionService.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			while (taskCounter > 0) {
+				try {
+					taskCompletionService.take();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				taskCounter--;
 			}
-			taskCounter--;
+			if(changed && it.hasNext()){
+				fitness();
+			}
 		}
 	}
 
@@ -472,10 +486,18 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @see Mutator
 	 * @param mutator
 	 */
-	public void setMutator(Mutator mutator) {
+	public void addMutator(Mutator mutator) {
 		if (mutator == null)
 			throw new NullPointerException("mutator cannot be null.");
-		properties.mutator = mutator;
+		properties.mutatorsList.add(mutator);
+	}
+	
+	/**
+	 * Zwraca liste mutatorów
+	 * @return lista mutatorów
+	 */
+	public ArrayList<Mutator> getMutators(){
+		return properties.mutatorsList;
 	}
 	/**
 	 * Ustawia parametr - <b>PopulationGenerator</b> używany generowania populacji startowej
@@ -533,10 +555,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
 		
-		MutatorsList mlist = new MutatorsList();
-		mlist.addMutator(new RandomMutator(1, 2));
-		mlist.addMutator(new ColorUnifier2(1, 2));
-		gcp.setMutator(mlist);
+		gcp.addMutator(new RandomMutator(1, 2));
+		gcp.addMutator(new ColorUnifier2(1, 2));
 		//gcp.setCrossover(new RandomCrossover());
 		//gcp.setPopulationGenerator(new UnifiedColorsPopulation());
 		//gcp.setParentSelector(new RandomParentSelector());
