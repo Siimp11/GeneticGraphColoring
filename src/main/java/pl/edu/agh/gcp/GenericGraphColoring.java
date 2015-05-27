@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -146,6 +148,110 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 
 	/**
+	 * Klasa do obserwowania wyniku działania algorytmu. Jak skonczy się działanie algorytmu informuje o wyniku. Jako wynik zwraca {@link Chromosome}
+	 * @author Daniel Tyka
+	 *
+	 */
+	private static class ObservableResult extends Observable{
+		/**
+		 * Ustawia wynik algorytmu i powiadamia obserwatorów
+		 * @param wynik
+		 */
+		public void setResult(Chromosome result){
+			setChanged();
+			notifyObservers(result);
+		}
+	}
+
+	/**
+	 * Klasa do oserwowania statystyk (min,avg i max). W każdej iteracji informuje o aktualnych statystykach. Jako wynik zwraca {@link GenericGraphColoring.Stats}
+	 * @author Daniel Tyka
+	 * @version 1.0
+	 *
+	 */
+	private static class ObservableStats extends Observable{
+		/**
+		 * Ustawia statystyki i informuje obserwujących
+		 * @param statystyki
+		 */
+		public void setStats(Stats stats){
+			setChanged();
+			notifyObservers(stats);
+		}
+	}
+	
+	/**
+	 * Klasa ze statystykami do rysowania wykresu. Zawiera minimum przystosowania, średnie przystosowanie i maksymalne.
+	 * @author Daniel Tyka
+	 * @version 1.0
+	 *
+	 */
+	public static class Stats{
+		/**
+		 * numer iteracji
+		 */
+		private int iteration;
+		/**
+		 * minimalne przystosowanie
+		 */
+		private int min;
+		/**
+		 * średnie przystosowanie
+		 */
+		private int avg;
+		/**
+		 * maksymalne przystosowanie
+		 */
+		private int max;
+		
+		/**
+		 * Konstruktor
+		 * @param iteration
+		 * @param min
+		 * @param avg
+		 * @param max
+		 */
+		public Stats(int iteration, int min, int avg, int max){
+			this.iteration = iteration;
+			this.min=min;
+			this.avg=avg;
+			this.max=max;
+		}
+		
+		/**
+		 * Zwraca {@link #iteration}
+		 * @return numer iteracji
+		 */
+		public int getIteration(){
+			return this.iteration;
+		}
+		
+		/**
+		 * Zwraca {@link #min}
+		 * @return minimalne przystosowanie
+		 */
+		public int getMin(){
+			return min;
+		}
+		
+		/**
+		 * Zwraca {@link #avg}
+		 * @return średnie przystosowanie
+		 */
+		public int getAvg(){
+			return avg;
+		}
+		
+		/**
+		 * Zwraca {@link #max}
+		 * @return maksymalne przystosownaie
+		 */
+		public int getMax(){
+			return max;
+		}
+	}
+	
+	/**
 	 * Opcje algorytmu
 	 */
 	private AlgorithmProperties properties = new AlgorithmProperties();
@@ -181,6 +287,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 	private ExecutorService taskExecutor;
 	private CompletionService<Chromosome> taskCompletionService;
+	private ObservableResult observableResult=new ObservableResult();
+	private ObservableStats observableStats=new ObservableStats();
 
 	/**
 	 * Konstruktor
@@ -197,6 +305,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 */
 	@Override
 	protected void preProcess() {
+		iterationsCounter=0;
 		vertex = graph.getVertices().toArray();
 		Arrays.sort(vertex);
 		vertexCount = vertex.length;
@@ -227,6 +336,9 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 */
 	@Override
 	protected boolean breakCondition() {
+		if(observableStats.countObservers()>0){
+			observableStats.setStats(countStats());
+		}
 		iterationsCounter++;
 		return iterationsCounter > properties.iterationsLimit;
 	}
@@ -317,8 +429,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	@Override
 	protected void postProcess() {
 		Chromosome ch = properties.resultSelector.selectResult(population);
-		System.out.println("Best child found: fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
-				+ " badEdges=" + ch.getBadEdges() + " coloring=" + Arrays.toString(ch.getColoringTab()));
+		observableResult.setResult(ch);
 		clean();
 	}
 
@@ -401,6 +512,36 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		return badEdges;
 	}
 
+	/**
+	 * Funkcja obliczająca statystyki - minimalne, średnie i maksymalne przystosowanie
+	 * @return statystyki
+	 */
+	private Stats countStats(){
+		int min=0;
+		int max=0;
+		int avg=0;
+		int count=0;
+		Chromosome ch;
+		Iterator<Chromosome> it = population.iterator();
+		if(it.hasNext()){
+			ch=it.next();
+			avg=max=min=ch.getFitness();
+			count=1;
+		}
+		while(it.hasNext()){
+			ch=it.next();
+			count++;
+			avg+=ch.getFitness();
+			if(min>ch.getFitness())
+				min=ch.getFitness();
+			if(max<ch.getFitness())
+				max=ch.getFitness();
+		}
+		if(count>0)
+			avg/=count;
+		return new Stats(iterationsCounter, min, avg, max);
+	}
+	
 	/**
 	 * Ustawia parametr - <b>wielkość populacji</b>
 	 * 
@@ -499,6 +640,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	public ArrayList<Mutator> getMutators(){
 		return properties.mutatorsList;
 	}
+	
 	/**
 	 * Ustawia parametr - <b>PopulationGenerator</b> używany generowania populacji startowej
 	 * @see PopulationGenerator
@@ -521,6 +663,22 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		this.graph = graph;
 	}
 
+	/**
+	 * Dodaje obserwatora wyniku
+	 * @param obserwator
+	 */
+	public void addResultObserver(Observer observer){
+		observableResult.addObserver(observer);
+	}
+	
+	/**
+	 * Dodaje obserwatora statystyk
+	 * @param obserwator
+	 */
+	public void addStatsObserver(Observer observer){
+		observableStats.addObserver(observer);
+	}
+	
 	public static void main(String[] args) {
 		/*Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
 		int n = 130;
@@ -555,15 +713,27 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
 		
-		gcp.addMutator(new RandomMutator(1, 2));
-		gcp.addMutator(new ColorUnifier2(1, 2));
-		//gcp.setCrossover(new RandomCrossover());
-		//gcp.setPopulationGenerator(new UnifiedColorsPopulation());
-		//gcp.setParentSelector(new RandomParentSelector());
+		gcp.addMutator(new RandomMutator(50, 100));
+		gcp.addMutator(new ColorUnifier2(50, 100));
 		gcp.setPopulationSize(500);
 		gcp.setIterationsLimit(200);
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
+		gcp.addResultObserver(new Observer() {
+			@Override
+			public void update(Observable o, Object arg) {
+				Chromosome ch = (Chromosome)arg;
+				System.out.println("Best child found: fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
+						+ " badEdges=" + ch.getBadEdges() + " coloring=" + Arrays.toString(ch.getColoringTab()));
+			}
+		});
+		gcp.addStatsObserver(new Observer() {
+			@Override
+			public void update(Observable o, Object arg) {
+				Stats s = (Stats) arg;
+				System.out.println("iteration: "+s.getIteration()+" min: "+s.getMin()+" avg: "+s.getAvg()+" max: "+s.getMax());
+			}
+		});
 		gcp.run();
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");
