@@ -16,6 +16,7 @@ import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -56,6 +57,7 @@ public class MainWindow extends JFrame{
 	 * Obiekty swinga
 	 */
 	private JPanel contentPane;
+	
 	private JPanel topMenu;
 	private JButton btnLoadGraph;
 	private JButton btnStart;
@@ -106,8 +108,14 @@ public class MainWindow extends JFrame{
 		setSize(1000,600);
 		setLayout(null);
 		
+		/**
+		 * Górne menu z przyciskami
+		 */
 		topMenu = new JPanel();
 		
+		/**
+		 * Główny panel
+		 */
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -119,7 +127,6 @@ public class MainWindow extends JFrame{
 		btnLoadGraph = new JButton("Wczytaj graf (DIMACS)");
 		btnLoadGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//TODO
 				JFileChooser c = new JFileChooser();
 				
 				c.setCurrentDirectory(new java.io.File("."));
@@ -133,15 +140,12 @@ public class MainWindow extends JFrame{
 					try {
 						parser.load();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 				currentGraph = parser.getGraph();
 				graphLayout.setGraph(currentGraph);
 				
-				
-				//TODO button
 				clearChartData();
 			}
 		});
@@ -168,10 +172,13 @@ public class MainWindow extends JFrame{
 						@Override
 						public void update(Observable o, Object arg) {
 							Chromosome ch = (Chromosome)arg;
-							//TODO wyskakujące okienko z wynikiem
 							colorVisualisedGraph(ch.getColors(), ch.getColoringTab());
+							
 							System.out.println("Best child found: fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
 									+ " badEdges=" + ch.getBadEdges() + " coloring=" + Arrays.toString(ch.getColoringTab()));
+							
+							JOptionPane.showMessageDialog(contentPane, "fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
+									+ " badEdges=" + ch.getBadEdges(), "Wynik", JOptionPane.INFORMATION_MESSAGE);
 						}
 					});
 					graphColoring.addStatsObserver(new Observer() {
@@ -195,6 +202,7 @@ public class MainWindow extends JFrame{
 		topMenu.add(btnStart);
 		
 		contentPane.add(topMenu, BorderLayout.NORTH);
+		
 		/**
 		 * Wyświetlanie grafu
 		 */
@@ -225,6 +233,7 @@ public class MainWindow extends JFrame{
 	 * @author JakubSzczepankiewicz
 	 *
 	 */
+	//TODO ustawienie domyślnego transformera po wczytaniu nowego grafu z pliku
 	private static class VertexPaintTransformer implements Transformer<Object,Paint> {
 
         private final PickedInfo<Object> pi;
