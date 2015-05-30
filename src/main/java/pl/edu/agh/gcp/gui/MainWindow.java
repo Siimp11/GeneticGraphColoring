@@ -4,20 +4,22 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.collections15.Transformer;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -39,6 +41,7 @@ import edu.uci.ics.jung.algorithms.layout.SpringLayout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.picking.PickedInfo;
 /**
  * 
  * @author JakubSzczepankiewicz
@@ -137,11 +140,9 @@ public class MainWindow extends JFrame{
 				currentGraph = parser.getGraph();
 				graphLayout.setGraph(currentGraph);
 				
-				//Czyszczenie danych na wykresie
+				
 				//TODO button
-				seriesMin.clear(); 
-				seriesAvg.clear();
-				seriesMax.clear();
+				clearChartData();
 			}
 		});
 		btnLoadGraph.setSize(150,30);
@@ -154,6 +155,7 @@ public class MainWindow extends JFrame{
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(currentGraph!=null){
+					clearChartData();
 					graphColoring = new GenericGraphColoring(currentGraph);
 					graphColoring.addMutator(new RandomMutator(50, 100));
 					graphColoring.addMutator(new ColorUnifier2(50, 100));
@@ -167,7 +169,7 @@ public class MainWindow extends JFrame{
 						public void update(Observable o, Object arg) {
 							Chromosome ch = (Chromosome)arg;
 							//TODO wyskakujące okienko z wynikiem
-							//TODO pokolorowanie wyświetlanego grafu
+							colorVisualisedGraph(ch.getColors(), ch.getColoringTab());
 							System.out.println("Best child found: fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
 									+ " badEdges=" + ch.getBadEdges() + " coloring=" + Arrays.toString(ch.getColoringTab()));
 						}
@@ -211,6 +213,56 @@ public class MainWindow extends JFrame{
         pack();
 	}
 	
+	//Czyszczenie danych na wykresie
+	private void clearChartData(){
+		seriesMin.clear(); 
+		seriesAvg.clear();
+		seriesMax.clear();
+	}
+	
+	/**
+	 * Transformer kolorów wierzchołków
+	 * @author JakubSzczepankiewicz
+	 *
+	 */
+	private static class VertexPaintTransformer implements Transformer<Object,Paint> {
+
+        private final PickedInfo<Object> pi;
+        private final Color[] palette;
+        private final int[] coloringTab;
+        
+        VertexPaintTransformer (PickedInfo<Object> pi, int colorsUsed, int[] coloringTab ) { 
+            super();
+            if (pi == null)
+                throw new IllegalArgumentException("PickedInfo instance must be non-null");
+            this.pi = pi;
+            
+            palette = new Color[colorsUsed];
+    		Random rand = new Random();
+    		for(int i=0;i<colorsUsed;i++){
+    			float r = rand.nextFloat();
+    			float g = rand.nextFloat();
+    			float b = rand.nextFloat();
+    	    	palette[i]=new Color(r,g,b);
+    	    }
+    		this.coloringTab = coloringTab;
+        }
+
+        @Override
+	    public Paint transform(Object i) {
+	        return palette[coloringTab[(Integer)i]];
+	    }
+    }
+	
+	/**
+	 * Metoda kolorująca wierzchołki obecnie wyświetlanego grafu
+	 * @param colorsUsed - ilość użytych kolorów
+	 * @param coloringTab - tablica kolorów posortowanych wierzchołków
+	 */
+	private void colorVisualisedGraph(int colorsUsed, final int[] coloringTab){
+		visualizationServer.getRenderContext().setVertexFillPaintTransformer(new VertexPaintTransformer(visualizationServer.getPickedVertexState(), colorsUsed, coloringTab));
+		//visualizationServer.repaint();
+	}
 	/**
 	 * Generuje nowy wykres
 	 * @return
