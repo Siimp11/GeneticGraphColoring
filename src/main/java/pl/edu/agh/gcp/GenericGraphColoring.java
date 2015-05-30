@@ -703,7 +703,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		System.out.println("Time: " + (time / 1000) + "s");*/
 		
 		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("test.col").getPath());
-		
+
 		try {
 			test.load();
 		} catch (Exception e) {

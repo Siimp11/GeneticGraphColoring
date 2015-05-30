@@ -7,4 +7,5 @@ repositories {
 
 dependencies {
 	compile 'net.sf.jung:jung-graph-impl:2.0.1'
+	compile 'jfree:jfreechart:1.0.12'
 }
