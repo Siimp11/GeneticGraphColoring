@@ -1,5 +1,6 @@
 package pl.edu.agh.gcp.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -10,11 +11,11 @@ import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.jfree.chart.ChartFactory;
@@ -52,6 +53,7 @@ public class MainWindow extends JFrame{
 	 * Obiekty swinga
 	 */
 	private JPanel contentPane;
+	private JPanel topMenu;
 	private JButton btnLoadGraph;
 	private JButton btnStart;
 	
@@ -101,10 +103,12 @@ public class MainWindow extends JFrame{
 		setSize(1000,600);
 		setLayout(null);
 		
+		topMenu = new JPanel();
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
+		contentPane.setLayout(new BorderLayout());
 		
 		/**
 		 * Przycisk do wczytywania grafu z pliku
@@ -140,8 +144,8 @@ public class MainWindow extends JFrame{
 				seriesMax.clear();
 			}
 		});
-		btnLoadGraph.setBounds(10, 10, 180, 25);
-		contentPane.add(btnLoadGraph);
+		btnLoadGraph.setSize(150,30);
+		topMenu.add(btnLoadGraph);
 		
 		/**
 		 * Przycisk uruchamiający algorytm
@@ -185,9 +189,10 @@ public class MainWindow extends JFrame{
 
 			}
 		});
-		btnStart.setBounds(50, 50, 180, 25);
-		contentPane.add(btnStart);
+		btnStart.setSize(150,30);
+		topMenu.add(btnStart);
 		
+		contentPane.add(topMenu, BorderLayout.NORTH);
 		/**
 		 * Wyświetlanie grafu
 		 */
@@ -195,13 +200,13 @@ public class MainWindow extends JFrame{
 		graphLayout.setSize(new Dimension(800,800)); // sets the initial size of the layout space
 		visualizationServer = new BasicVisualizationServer<Object,Object>(graphLayout);
 		visualizationServer.setPreferredSize(new Dimension(850,850)); //Sets the viewing area size
-        contentPane.add(visualizationServer);
+        contentPane.add(visualizationServer, BorderLayout.CENTER);
         
         /**
          * Wykres
          */
         chartPanel = createNewChart();
-        contentPane.add(chartPanel);
+        contentPane.add(chartPanel, BorderLayout.EAST);
         
         pack();
 	}
