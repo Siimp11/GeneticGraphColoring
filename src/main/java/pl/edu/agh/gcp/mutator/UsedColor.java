@@ -37,16 +37,16 @@ public class UsedColor implements Mutator {
 		for (int color : tab) {
 			usedColors[color] = true;
 		}
+		boolean usedColor; // czy losować użyte kolory czy nie
+		int colors; // ilość użytych kolorów / nie użytych - zależnie od usedColor
+		if ((colorLimit == chromosome.getColors()) || (random.nextInt(usedColorDenominator) < usedColorNumerator)) {
+			usedColor = true;
+			colors = chromosome.getColors();
+		} else {
+			usedColor = false;
+			colors = colorLimit-chromosome.getColors();
+		}
 		for (int i = 0; i < changes; i++) {
-			boolean usedColor; // czy losować użyte kolory czy nie
-			int colors; // ilość użytych kolorów / nie użytych - zależnie od usedColor
-			if ((colorLimit == chromosome.getColors()) || (random.nextInt(usedColorDenominator) < usedColorNumerator)) {
-				usedColor = true;
-				colors = chromosome.getColors();
-			} else {
-				usedColor = false;
-				colors = colorLimit-chromosome.getColors();
-			}
 			int colorNumber = random.nextInt(colors); // który kolor z kolei wybrać
 			int counter=0; //numer wybranego koloru
 			while(colorNumber>=0){

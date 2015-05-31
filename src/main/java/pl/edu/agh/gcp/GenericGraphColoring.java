@@ -19,6 +19,7 @@ import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
 import pl.edu.agh.gcp.mutator.Mutator;
 import pl.edu.agh.gcp.mutator.RandomMutator;
+import pl.edu.agh.gcp.mutator.UsedColor;
 import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
 import pl.edu.agh.gcp.parentSelector.ParentSelector;
 import pl.edu.agh.gcp.population.Chromosome;
@@ -258,6 +259,11 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	/**
 	 * Limit ilości użytych kolorów (numeracja kolorów od 0)
 	 */
+	
+	/**
+	 * Czy limit kolorów jest ustawiony na sztywno
+	 */
+	protected boolean isSetColorLimit=false;
 	protected int colorLimit = 0;
 	/**
 	 * Licznik iteracji
@@ -310,14 +316,17 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		Arrays.sort(vertex);
 		vertexCount = vertex.length;
 		edges = graph.getEdges();
-		colorLimit=0;
-		int tmp;
-		for (Object o : vertex) {
-			tmp = graph.getNeighborCount(o);
-			if (tmp > colorLimit)
-				colorLimit = tmp;
+		if(!isSetColorLimit){
+			colorLimit=0;
+		
+        		int tmp;
+        		for (Object o : vertex) {
+        			tmp = graph.getNeighborCount(o);
+        			if (tmp > colorLimit)
+        				colorLimit = tmp;
+        		}
+        		colorLimit += 1;
 		}
-		colorLimit += 1;
 
 		taskExecutor = Executors.newFixedThreadPool(properties.threads);
 		taskCompletionService = new ExecutorCompletionService<Chromosome>(taskExecutor);
@@ -662,6 +671,24 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 
 	/**
+	 * Ustawia na sztywno limit kolorów. Usuwanie limitu - {@link #setColorLimit(int)}
+	 * @param colorLimit
+	 */
+	public void setColorLimit(int colorLimit){
+		if (colorLimit < 1)
+			throw new IllegalArgumentException("color limit cannot be less than 1.");
+		isSetColorLimit=true;
+		this.colorLimit=colorLimit;
+	}
+	
+	/**
+	 * Usuwa ustawiony limit kolorów
+	 */
+	public void unsetColorLimit(){
+		isSetColorLimit=false;
+	}
+	
+	/**
 	 * Dodaje obserwatora wyniku
 	 * @param obserwator
 	 */
@@ -692,7 +719,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		gcp.addMutator(new RandomMutator(50, 100));
 		gcp.addMutator(new ColorUnifier2(50, 100));
 		gcp.setPopulationSize(500);
-		gcp.setIterationsLimit(200);
+		gcp.setIterationsLimit(300);
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
 		gcp.addResultObserver(new Observer() {
@@ -711,10 +738,6 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 			}
 		});
 		gcp.run();
-		/*gcp.preProcess();
-		gcp.startPopulation();
-		gcp.fitness();
-		gcp.crossover();*/
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");
 	}

@@ -164,7 +164,7 @@ public class MainWindow extends JFrame{
 					graphColoring.addMutator(new RandomMutator(50, 100));
 					graphColoring.addMutator(new ColorUnifier2(50, 100));
 					graphColoring.setPopulationSize(500);
-					graphColoring.setIterationsLimit(200);
+					graphColoring.setIterationsLimit(300);
 					graphColoring.setBadEdgeWeight(5);
 					graphColoring.setColorsUsedWeight(2);
 					
