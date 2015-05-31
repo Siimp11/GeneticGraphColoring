@@ -44,7 +44,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @author Daniel Tyka
 	 * @version 1.0
 	 */
-	private class DoCountFitness implements Callable<Chromosome> {
+	protected class DoCountFitness implements Callable<Chromosome> {
 		private Chromosome ch;
 
 		public DoCountFitness(Chromosome ch) {
@@ -65,7 +65,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @author Daniel Tyka
 	 * @version 1.0
 	 */
-	private class DoCrossover implements Callable<Chromosome> {
+	protected class DoCrossover implements Callable<Chromosome> {
 
 		@Override
 		public Chromosome call() throws Exception {
@@ -80,7 +80,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @author Daniel Tyka
 	 * @version 1.0
 	 */
-	private class DoMutate implements Callable<Chromosome> {
+	protected class DoMutate implements Callable<Chromosome> {
 		private Chromosome ch;
 		private Mutator m;
 
@@ -104,7 +104,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @author Daniel Tyka
 	 * @version 1.0
 	 */
-	private static class AlgorithmProperties {
+	protected static class AlgorithmProperties {
 		/**
 		 * Wielkość populacji
 		 */
@@ -254,39 +254,39 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	/**
 	 * Opcje algorytmu
 	 */
-	private AlgorithmProperties properties = new AlgorithmProperties();
+	protected AlgorithmProperties properties = new AlgorithmProperties();
 	/**
 	 * Limit ilości użytych kolorów (numeracja kolorów od 0)
 	 */
-	private int colorLimit = 0;
+	protected int colorLimit = 0;
 	/**
 	 * Licznik iteracji
 	 */
-	private int iterationsCounter = 0;
+	protected int iterationsCounter = 0;
 
 	/**
 	 * Graf do pokolorowania
 	 */
-	private Graph<Object, Object> graph;
+	protected Graph<Object, Object> graph;
 	/**
 	 * Tablica wierzchołków grafu (posortowana - do binary search)
 	 */
-	private Object[] vertex;
+	protected Object[] vertex;
 	/**
 	 * Kolekcja krawędzi grafu
 	 */
-	private Collection<Object> edges;
+	protected Collection<Object> edges;
 	/**
 	 * ilość wierzchołków grafu
 	 */
-	private int vertexCount;
+	protected int vertexCount;
 	/**
 	 * Populacja chromosomów
 	 */
-	private Population population;
+	protected Population population;
 
-	private ExecutorService taskExecutor;
-	private CompletionService<Chromosome> taskCompletionService;
+	protected ExecutorService taskExecutor;
+	protected CompletionService<Chromosome> taskCompletionService;
 	private ObservableResult observableResult=new ObservableResult();
 	private ObservableStats observableStats=new ObservableStats();
 
@@ -436,7 +436,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	/**
 	 * Funkcja czyszcząca
 	 */
-	private void clean() {
+	protected void clean() {
 		taskExecutor.shutdown();
 	}
 
@@ -446,7 +446,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param ch
 	 *            - chromosom dla którego trzeba obliczyć przystosowanie
 	 */
-	private void fitnessFunction(Chromosome ch) {
+	protected void fitnessFunction(Chromosome ch) {
 		int fit = properties.badEdgeWeight * countBadEdges(ch) + properties.colorsUsedWeight * countColors(ch);
 		ch.setFitness(fit);
 	}
@@ -458,7 +458,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @see #setCrossover(Crossover)
 	 * @return wygenerowany potomek
 	 */
-	private final Chromosome crossoverFunction() {
+	protected final Chromosome crossoverFunction() {
 		Pair<Chromosome> parents = properties.parentSelector.selectParents(population);
 		return properties.crossover.crossoverFunction(parents.getFirst(), parents.getSecond());
 	}
@@ -475,8 +475,6 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 			return ch.getColors();
 		int colors = 0;
 		boolean tab[] = new boolean[ch.size()];
-		for(int i=0;i<tab.length;i++)
-			tab[i]=false;
 		for (int i : ch.getColoringTab()) {
 			tab[i] = true;
 		}
@@ -548,8 +546,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @param populationSize
 	 */
 	public void setPopulationSize(int populationSize) {
-		if (populationSize < 1)
-			throw new IllegalArgumentException("populationSize cannot be less than 1.");
+		if (populationSize < 2)
+			throw new IllegalArgumentException("populationSize cannot be less than 2.");
 		properties.populationSize = populationSize;
 	}
 
@@ -680,28 +678,6 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		/*Graph<Object, Object> graph = new UndirectedSparseGraph<Object, Object>();
-		int n = 130;
-		for (int i = 0; i < n; i++) {
-			graph.addVertex(Integer.valueOf(i));
-		}
-		for (int i = 0; i < n; i++) {
-			for (int j = i + 1; j < n; j++) {
-				graph.addEdge(Integer.valueOf(n * i + j), Integer.valueOf(i), Integer.valueOf(j));
-			}
-		}
-		long start = System.currentTimeMillis();
-		GenericGraphColoring gcp = new GenericGraphColoring(graph);
-		gcp.setMutator(new ColourUnifier());
-		gcp.setPopulationGenerator(new UnifiedColorsPopulation());
-		gcp.setPopulationSize(500);
-		gcp.setBadEdgeWeight(5);
-		gcp.setColorsUsedWeight(2);
-		gcp.setIterationsLimit(200);
-		gcp.run();
-		long time = System.currentTimeMillis() - start;
-		System.out.println("Time: " + (time / 1000) + "s");*/
-		
 		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("test.col").getPath());
 		
 		try {
@@ -735,6 +711,10 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 			}
 		});
 		gcp.run();
+		/*gcp.preProcess();
+		gcp.startPopulation();
+		gcp.fitness();
+		gcp.crossover();*/
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time: " + (time / 1000) + "s");
 	}
