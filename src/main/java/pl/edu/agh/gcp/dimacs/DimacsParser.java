@@ -7,6 +7,11 @@ import java.io.FileReader;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 
+/**
+ * Parser plików w formacie DIMACS
+ * @author JakubSzczepankiewicz
+ *
+ */
 public class DimacsParser {
 	private String filename;
 	private Graph<Object, Object> graph;

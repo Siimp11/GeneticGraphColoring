@@ -679,7 +679,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	
 	public static void main(String[] args) {
 		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("test.col").getPath());
-		
+
 		try {
 			test.load();
 		} catch (Exception e) {
