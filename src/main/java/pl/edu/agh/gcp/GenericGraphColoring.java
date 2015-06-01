@@ -17,9 +17,9 @@ import pl.edu.agh.gcp.crossover.Crossover;
 import pl.edu.agh.gcp.crossover.DefaultCrossover;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
+import pl.edu.agh.gcp.mutator.FixBadEdgesImproved;
 import pl.edu.agh.gcp.mutator.Mutator;
 import pl.edu.agh.gcp.mutator.RandomMutator;
-import pl.edu.agh.gcp.mutator.UsedColor;
 import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
 import pl.edu.agh.gcp.parentSelector.ParentSelector;
 import pl.edu.agh.gcp.population.Chromosome;
@@ -716,12 +716,14 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		long start = System.currentTimeMillis();
 		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
 		
-		gcp.addMutator(new RandomMutator(50, 100));
+		gcp.addMutator(new RandomMutator(40, 100));
+		gcp.addMutator(new FixBadEdgesImproved(75, 100));
 		gcp.addMutator(new ColorUnifier2(50, 100));
 		gcp.setPopulationSize(500);
-		gcp.setIterationsLimit(300);
+		gcp.setIterationsLimit(500);
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
+		//gcp.setColorLimit(8);
 		gcp.addResultObserver(new Observer() {
 			@Override
 			public void update(Observable o, Object arg) {

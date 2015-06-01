@@ -35,6 +35,7 @@ import pl.edu.agh.gcp.GenericGraphColoring;
 import pl.edu.agh.gcp.GenericGraphColoring.Stats;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
+import pl.edu.agh.gcp.mutator.FixBadEdgesImproved;
 import pl.edu.agh.gcp.mutator.RandomMutator;
 import pl.edu.agh.gcp.population.Chromosome;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -161,10 +162,11 @@ public class MainWindow extends JFrame{
 				if(currentGraph!=null){
 					clearChartData();
 					graphColoring = new GenericGraphColoring(currentGraph);
-					graphColoring.addMutator(new RandomMutator(50, 100));
+					graphColoring.addMutator(new RandomMutator(35, 100));
+					graphColoring.addMutator(new FixBadEdgesImproved(80, 100));
 					graphColoring.addMutator(new ColorUnifier2(50, 100));
 					graphColoring.setPopulationSize(500);
-					graphColoring.setIterationsLimit(300);
+					graphColoring.setIterationsLimit(500);
 					graphColoring.setBadEdgeWeight(5);
 					graphColoring.setColorsUsedWeight(2);
 					
@@ -206,7 +208,7 @@ public class MainWindow extends JFrame{
 		/**
 		 * Wyświetlanie grafu
 		 */
-		graphLayout = new SpringLayout(new UndirectedSparseGraph<Object, Object>());
+		graphLayout = new SpringLayout<Object, Object>(new UndirectedSparseGraph<Object, Object>());
 		graphLayout.setSize(new Dimension(800,800)); // sets the initial size of the layout space
 		visualizationServer = new BasicVisualizationServer<Object,Object>(graphLayout);
 		visualizationServer.setPreferredSize(new Dimension(850,850)); //Sets the viewing area size
