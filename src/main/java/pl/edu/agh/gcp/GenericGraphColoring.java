@@ -153,7 +153,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @author Daniel Tyka
 	 *
 	 */
-	private static class ObservableResult extends Observable{
+	protected static class ObservableResult extends Observable{
 		/**
 		 * Ustawia wynik algorytmu i powiadamia obserwatorów
 		 * @param wynik
@@ -170,7 +170,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	 * @version 1.0
 	 *
 	 */
-	private static class ObservableStats extends Observable{
+	protected static class ObservableStats extends Observable{
 		/**
 		 * Ustawia statystyki i informuje obserwujących
 		 * @param statystyki
@@ -250,20 +250,28 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		public int getMax(){
 			return max;
 		}
+	
+		/**
+		 * Ustawia {@link #iteration}
+		 * @param iteration
+		 */
+		public void setIteration(int iteration){
+			this.iteration=iteration;
+		}
 	}
 	
 	/**
 	 * Opcje algorytmu
 	 */
 	protected AlgorithmProperties properties = new AlgorithmProperties();
-	/**
-	 * Limit ilości użytych kolorów (numeracja kolorów od 0)
-	 */
-	
+		
 	/**
 	 * Czy limit kolorów jest ustawiony na sztywno
 	 */
 	protected boolean isSetColorLimit=false;
+	/**
+	 * Limit ilości użytych kolorów (numeracja kolorów od 0)
+	 */
 	protected int colorLimit = 0;
 	/**
 	 * Licznik iteracji
@@ -293,8 +301,8 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 
 	protected ExecutorService taskExecutor;
 	protected CompletionService<Chromosome> taskCompletionService;
-	private ObservableResult observableResult=new ObservableResult();
-	private ObservableStats observableStats=new ObservableStats();
+	protected ObservableResult observableResult=new ObservableResult();
+	protected ObservableStats observableStats=new ObservableStats();
 
 	/**
 	 * Konstruktor
@@ -349,7 +357,16 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 			observableStats.setStats(countStats());
 		}
 		iterationsCounter++;
-		return iterationsCounter > properties.iterationsLimit;
+		if(iterationsCounter > properties.iterationsLimit)
+			return true;
+		else{
+			if(isSetColorLimit)
+				for(Chromosome ch : population)
+					if(ch.getColors()<=colorLimit && ch.getBadEdges()==0)
+						return true;
+
+		}
+		return false;
 	}
 
 	/**
@@ -705,7 +722,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("test.col").getPath());
+		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("queen9_9.col").getPath());
 
 		try {
 			test.load();
@@ -714,16 +731,16 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		}
 		
 		long start = System.currentTimeMillis();
-		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
+		GenericGraphColoring gcp = new GenericGraphColoring2(test.getGraph());
 		
-		gcp.addMutator(new RandomMutator(40, 100));
-		gcp.addMutator(new FixBadEdgesImproved(75, 100));
+		gcp.addMutator(new RandomMutator(50, 100));
+		gcp.addMutator(new FixBadEdgesImproved(70, 100));
 		gcp.addMutator(new ColorUnifier2(50, 100));
 		gcp.setPopulationSize(500);
 		gcp.setIterationsLimit(500);
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
-		//gcp.setColorLimit(8);
+		gcp.setColorLimit(10);
 		gcp.addResultObserver(new Observer() {
 			@Override
 			public void update(Observable o, Object arg) {
