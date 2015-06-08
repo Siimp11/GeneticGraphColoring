@@ -9,7 +9,7 @@ import pl.edu.agh.gcp.population.Population;
  * @version 1.0
  *
  */
-public class DefaultResultSelector implements ResultSelector {
+public class DefaultResultSelector implements BestResultSelector {
 
     /**
      * {@inheritDoc}

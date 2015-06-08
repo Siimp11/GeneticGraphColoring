@@ -9,7 +9,7 @@ import pl.edu.agh.gcp.population.Population;
  * @version 1.0
  *
  */
-public interface ResultSelector {
+public interface BestResultSelector {
     /**
      * Wybiera wynikowy Chromosom z populacji
      * @param population

@@ -8,11 +8,11 @@ import pl.edu.agh.gcp.population.Population;
 import edu.uci.ics.jung.graph.util.Pair;
 
 /**
- * Domyślna implementacja {@link ParentSelector}
+ * Turniejowy sposób wyboru rodziców. Najpierw wybiera 5 losowych osobników z populacji, a 2 najlepszych z tej grupy staje się rodzicami.
  * @author daniel
  *
  */
-public class DefaultParentSelector implements ParentSelector {
+public class TournamentParentSelector implements ParentSelector {
     private Random random = new Random();
 
     /**

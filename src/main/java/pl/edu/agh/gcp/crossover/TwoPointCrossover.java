@@ -5,12 +5,12 @@ import java.util.Random;
 import pl.edu.agh.gcp.population.Chromosome;
 
 /**
- * Domyślna implementacja generacji potomków
+ * Operator krzyżowania rodziców z dwoma punktami podziału
  * @author Daniel Tyka
  * @version 1.0
  *
  */
-public class DefaultCrossover implements Crossover {
+public class TwoPointCrossover implements Crossover {
     private Random random = new Random();
 
     /**

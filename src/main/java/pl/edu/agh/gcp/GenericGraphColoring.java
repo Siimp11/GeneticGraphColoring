@@ -14,20 +14,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import pl.edu.agh.gcp.crossover.Crossover;
-import pl.edu.agh.gcp.crossover.DefaultCrossover;
+import pl.edu.agh.gcp.crossover.TwoPointCrossover;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
-import pl.edu.agh.gcp.mutator.FixBadEdgesImproved;
 import pl.edu.agh.gcp.mutator.Mutator;
 import pl.edu.agh.gcp.mutator.RandomMutator;
-import pl.edu.agh.gcp.parentSelector.DefaultParentSelector;
+import pl.edu.agh.gcp.parentSelector.TournamentParentSelector;
 import pl.edu.agh.gcp.parentSelector.ParentSelector;
 import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 import pl.edu.agh.gcp.populationGenerator.PopulationGenerator;
 import pl.edu.agh.gcp.populationGenerator.RandomPopulation;
 import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
-import pl.edu.agh.gcp.resultSelector.ResultSelector;
+import pl.edu.agh.gcp.resultSelector.BestResultSelector;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Pair;
 
@@ -129,11 +128,11 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		/**
 		 * ParentSelector do wybierania rodziców nasępnego chromosomu
 		 */
-		public ParentSelector parentSelector = new DefaultParentSelector();
+		public ParentSelector parentSelector = new TournamentParentSelector();
 		/**
 		 * Crossover do tworzenia kolejnych potomkow rodziców
 		 */
-		public Crossover crossover = new DefaultCrossover();
+		public Crossover crossover = new TwoPointCrossover();
 		/**
 		 * Lista Mutatorów to mutowania chromosomow - wykonywane po kolei na każdym chromosomie
 		 */
@@ -141,7 +140,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		/**
 		 * ResultSelector do wybierania wyniku
 		 */
-		public ResultSelector resultSelector = new DefaultResultSelector();
+		public BestResultSelector resultSelector = new DefaultResultSelector();
 		/**
 		 * Generator populacji startowej
 		 */
@@ -731,16 +730,16 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		}
 		
 		long start = System.currentTimeMillis();
-		GenericGraphColoring gcp = new GenericGraphColoring2(test.getGraph());
+		GenericGraphColoring gcp = new GenericGraphColoring(test.getGraph());
 		
 		gcp.addMutator(new RandomMutator(50, 100));
-		gcp.addMutator(new FixBadEdgesImproved(70, 100));
+		//gcp.addMutator(new FixBadEdgesImproved(80, 100));
 		gcp.addMutator(new ColorUnifier2(50, 100));
 		gcp.setPopulationSize(500);
 		gcp.setIterationsLimit(500);
 		gcp.setBadEdgeWeight(5);
 		gcp.setColorsUsedWeight(2);
-		gcp.setColorLimit(10);
+		//gcp.setColorLimit(20);
 		gcp.addResultObserver(new Observer() {
 			@Override
 			public void update(Observable o, Object arg) {

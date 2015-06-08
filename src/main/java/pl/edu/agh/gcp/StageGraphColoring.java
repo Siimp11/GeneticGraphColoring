@@ -508,7 +508,7 @@ public class StageGraphColoring extends GenericGraphColoring {
 	}
 	
 	public static void main(String[] args) {
-		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("queen9_9.col").getPath());
+		DimacsParser test = new DimacsParser(GenericGraphColoring.class.getClassLoader().getResource("queen7_7.col").getPath());
 
 		try {
 			test.load();
@@ -519,7 +519,7 @@ public class StageGraphColoring extends GenericGraphColoring {
 		long start = System.currentTimeMillis();
 		StageGraphColoring scp = new StageGraphColoring(test.getGraph());
 		
-		scp.setStage1_PopulationSize(300);
+		scp.setStage1_PopulationSize(200);
 		scp.setStage1_IterationsLimit(300);
 		scp.addStage1_Mutator(new RandomMutator(40, 100));
 		scp.addStage1_Mutator(new ColorUnifier2(50, 100));
