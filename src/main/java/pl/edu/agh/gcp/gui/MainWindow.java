@@ -4,20 +4,29 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.collections15.Transformer;
@@ -31,7 +40,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import pl.edu.agh.gcp.GenericGraphColoring;
 import pl.edu.agh.gcp.GenericGraphColoring.Stats;
 import pl.edu.agh.gcp.StageGraphColoring;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
@@ -59,17 +67,42 @@ public class MainWindow extends JFrame{
 	 * Obiekty swinga
 	 */
 	private JPanel contentPane;
-	
+	/******************/
 	private JPanel topMenu;
 	private JButton btnLoadGraph;
 	private JButton btnStart;
+	private JPanel settingsPanel;
 	
+	private JPanel settingsStageOnePanel;
+	private JSpinner populationSpinnerStageOne;
+	private JSpinner iterationSpinnerStageOne;
+	
+	private JPanel settingsStageTwoPanel;
+	private JSpinner populationSpinnerStageTwo;
+	private JSpinner iterationSpinnerStageTwo;
+	
+	private JPanel settingsStageThreePanel;
+	private JSpinner populationSpinnerStageThree;
+	private JSpinner iterationSpinnerStageThree;
+	
+	/******************/
+	private JPanel bottomMenu;
+	private JLabel fitnessLabel;
+	private JLabel colorsLabel;
+	private JLabel badEdgesLabel;
+	
+	private final String fitnessLabelPrefix = "Przystosowanie: ";
+	private final String colorsLabelPrefix = "Użyte kolory: ";
+	private final String badEdgesLabelPrefix = "Błędne krawędzie: ";
+	
+	/******************/
 	/**
-	 * Obiekty związane z wizualizacją grafem
+	 * Obiekty związane z wizualizacją grafu
 	 */
 	private Layout<Object, Object> graphLayout;
 	private BasicVisualizationServer<Object,Object> visualizationServer;
 	
+	/******************/
 	/**
 	 * Obiekty związane z wizualizacją wykresu
 	 */
@@ -81,6 +114,7 @@ public class MainWindow extends JFrame{
 	private XYSeries seriesAvg;
 	private XYSeries seriesMax;
 	
+	/******************/
 	/**
 	 * Obiekty związane z algorytmem
 	 */
@@ -111,17 +145,19 @@ public class MainWindow extends JFrame{
 		setLayout(null);
 		
 		/**
-		 * Górne menu z przyciskami
-		 */
-		topMenu = new JPanel();
-		
-		/**
 		 * Główny panel
 		 */
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout());
+		
+		/**********************************************************************************************************
+		
+		/**
+		 * Górne menu z przyciskami
+		 */
+		topMenu = new JPanel();
 		
 		/**
 		 * Przycisk do wczytywania grafu z pliku
@@ -145,10 +181,12 @@ public class MainWindow extends JFrame{
 						e.printStackTrace();
 					}
 				}
-				currentGraph = parser.getGraph();
-				graphLayout.setGraph(currentGraph);
-				
-				clearChartData();
+				if(parser.getGraph() != null){
+					currentGraph = parser.getGraph();
+					graphLayout.setGraph(currentGraph);
+					visualizationServer.getRenderContext().setVertexFillPaintTransformer(new DefaultVertexPaintTransformer());
+					clearChartData();
+				}
 			}
 		});
 		btnLoadGraph.setSize(150,30);
@@ -164,19 +202,27 @@ public class MainWindow extends JFrame{
 					clearChartData();
 					graphColoring = new StageGraphColoring(currentGraph);
 					
-					graphColoring.setStage1_PopulationSize(200);
-					graphColoring.setStage1_IterationsLimit(300);
+					commitSpinnerEdits();
+					
+					//graphColoring.setStage1_PopulationSize(200);
+					//graphColoring.setStage1_IterationsLimit(300);
+					graphColoring.setStage1_PopulationSize((Integer)populationSpinnerStageOne.getValue());
+					graphColoring.setStage1_IterationsLimit((Integer)iterationSpinnerStageOne.getValue());
 					graphColoring.addStage1_Mutator(new RandomMutator(40, 100));
 					graphColoring.addStage1_Mutator(new ColorUnifier2(50, 100));
 					
-					graphColoring.setStage2_PopulationSize(100);
-					graphColoring.setStage2_IterationsLimit(200);
+					//graphColoring.setStage2_PopulationSize(100);
+					//graphColoring.setStage2_IterationsLimit(200);
+					graphColoring.setStage2_PopulationSize((Integer)populationSpinnerStageTwo.getValue());
+					graphColoring.setStage2_IterationsLimit((Integer)iterationSpinnerStageTwo.getValue());
 					graphColoring.addStage2_Mutator(new RandomMutator(35, 100));
 					graphColoring.addStage2_Mutator(new FixBadEdgesImproved(80, 100));
 					graphColoring.addStage2_Mutator(new ColorUnifier2(50, 100));
 					
-					graphColoring.setStage3_PopulationSize(500);
-					graphColoring.setStage3_IterationsLimit(500);
+					//graphColoring.setStage3_PopulationSize(500);
+					//graphColoring.setStage3_IterationsLimit(500);
+					graphColoring.setStage3_PopulationSize((Integer)populationSpinnerStageThree.getValue());
+					graphColoring.setStage3_IterationsLimit((Integer)iterationSpinnerStageThree.getValue());
 					graphColoring.addStage3_Mutator(new RandomMutator(50, 100));
 					graphColoring.addStage3_Mutator(new FixBadEdgesImproved(70, 100));
 					graphColoring.addStage3_Mutator(new ColorUnifier2(50, 100));
@@ -189,6 +235,7 @@ public class MainWindow extends JFrame{
 						public void update(Observable o, Object arg) {
 							Chromosome ch = (Chromosome)arg;
 							colorVisualisedGraph(ch.getColors(), ch.getColoringTab());
+							updateLabels(ch);
 							
 							System.out.println("Best child found: fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
 									+ " badEdges=" + ch.getBadEdges() + " coloring=" + Arrays.toString(ch.getColoringTab()));
@@ -226,8 +273,46 @@ public class MainWindow extends JFrame{
 		btnStart.setSize(150,30);
 		topMenu.add(btnStart);
 		
-		contentPane.add(topMenu, BorderLayout.NORTH);
+		/**
+		 * Panel ustawień ilości populacji i iteracji
+		 */
+		settingsPanel = new JPanel();
+		settingsPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.PAGE_AXIS));
 		
+		settingsStageOnePanel = new JPanel();
+		settingsStageOnePanel.setLayout(new BoxLayout(settingsStageOnePanel, BoxLayout.LINE_AXIS));
+		populationSpinnerStageOne = new JSpinner(new SpinnerNumberModel(200, 0, 800, 1));
+		iterationSpinnerStageOne = new JSpinner(new SpinnerNumberModel(300, 0, 800, 1));
+		settingsStageOnePanel.add(new JLabel("Etap I   "));
+		settingsStageOnePanel.add(populationSpinnerStageOne);
+		settingsStageOnePanel.add(iterationSpinnerStageOne);
+		
+		settingsStageTwoPanel = new JPanel();
+		settingsStageTwoPanel.setLayout(new BoxLayout(settingsStageTwoPanel, BoxLayout.LINE_AXIS));
+		populationSpinnerStageTwo = new JSpinner(new SpinnerNumberModel(100, 0, 800, 1));
+		iterationSpinnerStageTwo = new JSpinner(new SpinnerNumberModel(200, 0, 800, 1));
+		settingsStageTwoPanel.add(new JLabel("Etap II  "));
+		settingsStageTwoPanel.add(populationSpinnerStageTwo);
+		settingsStageTwoPanel.add(iterationSpinnerStageTwo);
+		
+		settingsStageThreePanel = new JPanel();
+		settingsStageThreePanel.setLayout(new BoxLayout(settingsStageThreePanel, BoxLayout.LINE_AXIS));
+		populationSpinnerStageThree = new JSpinner(new SpinnerNumberModel(500, 0, 800, 1));
+		iterationSpinnerStageThree = new JSpinner(new SpinnerNumberModel(500, 0, 800, 1));
+		settingsStageThreePanel.add(new JLabel("Etap III "));
+		settingsStageThreePanel.add(populationSpinnerStageThree);
+		settingsStageThreePanel.add(iterationSpinnerStageThree);
+
+		settingsPanel.add(new JLabel("Ilość populacji                       Ilość iteracji", SwingConstants.CENTER)); //TODO sry lenistwo xD
+		settingsPanel.add(settingsStageOnePanel);
+		settingsPanel.add(settingsStageTwoPanel);
+		settingsPanel.add(settingsStageThreePanel);
+		
+		topMenu.add(settingsPanel);
+		
+		contentPane.add(topMenu, BorderLayout.NORTH);
+		/**********************************************************************************************************
 		/**
 		 * Wyświetlanie grafu
 		 */
@@ -235,14 +320,40 @@ public class MainWindow extends JFrame{
 		graphLayout.setSize(new Dimension(800,800)); // sets the initial size of the layout space
 		visualizationServer = new BasicVisualizationServer<Object,Object>(graphLayout);
 		visualizationServer.setPreferredSize(new Dimension(850,850)); //Sets the viewing area size
+		
         contentPane.add(visualizationServer, BorderLayout.CENTER);
-        
+        /**********************************************************************************************************
         /**
          * Wykres
          */
         chartPanel = createNewChart();
-        contentPane.add(chartPanel, BorderLayout.EAST);
         
+        contentPane.add(chartPanel, BorderLayout.EAST);
+        /**********************************************************************************************************
+        /**
+         * Stopka z informacjami
+         */
+        bottomMenu = new JPanel();
+        bottomMenu.setLayout(new GridLayout(3,1));
+        
+        fitnessLabel = new JLabel();
+        fitnessLabel.setText(fitnessLabelPrefix);
+        fitnessLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        bottomMenu.add(fitnessLabel);
+        
+        colorsLabel = new JLabel();
+        colorsLabel.setText(colorsLabelPrefix);
+        colorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        bottomMenu.add(colorsLabel);
+        
+        badEdgesLabel = new JLabel();
+        badEdgesLabel.setText(badEdgesLabelPrefix);
+        badEdgesLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        bottomMenu.add(badEdgesLabel);
+        
+        
+        contentPane.add(bottomMenu, BorderLayout.SOUTH);
+        /**********************************************************************************************************/
         pack();
 	}
 	
@@ -254,7 +365,7 @@ public class MainWindow extends JFrame{
 	}
 	
 	/**
-	 * Transformer kolorów wierzchołków
+	 * Transformer kolorów wierzchołków dla danego pokolorowania
 	 * @author JakubSzczepankiewicz
 	 *
 	 */
@@ -289,6 +400,18 @@ public class MainWindow extends JFrame{
     }
 	
 	/**
+	 * Domyślny transformer kolorów wierzchołków
+	 * @author JakubSzczepankiewicz
+	 *
+	 */
+	private static class DefaultVertexPaintTransformer implements Transformer<Object,Paint> {
+		@Override
+		public Paint transform(Object i){
+			return Color.GREEN;
+		}
+	}
+	
+	/**
 	 * Metoda kolorująca wierzchołki obecnie wyświetlanego grafu
 	 * @param colorsUsed - ilość użytych kolorów
 	 * @param coloringTab - tablica kolorów posortowanych wierzchołków
@@ -297,8 +420,35 @@ public class MainWindow extends JFrame{
 		visualizationServer.getRenderContext().setVertexFillPaintTransformer(new VertexPaintTransformer(visualizationServer.getPickedVertexState(), colorsUsed, coloringTab));
 		//visualizationServer.repaint();
 	}
+
+	
 	/**
-	 * Generuje nowy wykres
+	 * Aktualizuje wynik wyświetlany w stopce
+	 * @param ch
+	 */
+	private void updateLabels(Chromosome ch){
+		fitnessLabel.setText(fitnessLabelPrefix+Integer.toString(ch.getFitness()));
+		colorsLabel.setText(colorsLabelPrefix+Integer.toString(ch.getColors()));
+		badEdgesLabel.setText(badEdgesLabelPrefix+Integer.toString(ch.getBadEdges()));
+	}
+	
+	/**
+	 * Wprowadza zmiany w spinnerach wpisane przez użytkownika
+	 */
+	private void commitSpinnerEdits(){
+		try {
+			populationSpinnerStageOne.commitEdit();
+			iterationSpinnerStageOne.commitEdit();
+			populationSpinnerStageTwo.commitEdit();
+			iterationSpinnerStageTwo.commitEdit();
+			populationSpinnerStageThree.commitEdit();
+			iterationSpinnerStageThree.commitEdit();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Generuje nowy czysty wykres
 	 * @return
 	 */
 	private ChartPanel createNewChart(){
