@@ -19,54 +19,6 @@ import edu.uci.ics.jung.graph.Graph;
 public class StageGraphColoring extends GenericGraphColoring {
 
 	/**
-	 * Klasa z opcjami etapów algorytmu
-	 * 
-	 * @author Daniel Tyka
-	 *
-	 */
-	protected static class StageAlgorithmProperties { // TODO
-		/**
-		 * Wielkość populacji - etap pierwszy
-		 */
-		public int stage1_populationSize = 500;
-		/**
-		 * Limit iteracji - etap pierwszy
-		 */
-		public int stage1_iterationsLimit = 200;
-		/**
-		 * Etap pierwszy - lista Mutatorów to mutowania chromosomow - wykonywane po kolei na każdym chromosomie
-		 */
-		public ArrayList<Mutator> stage1_mutatorsList = new ArrayList<Mutator>();
-
-		/**
-		 * Wielkość populacji - etap drugi
-		 */
-		public int stage2_populationSize = 500;
-		/**
-		 * Limit iteracji - etap drugi
-		 */
-		public int stage2_iterationsLimit = 200;
-		/**
-		 * Etap drugi - lista Mutatorów to mutowania chromosomow - wykonywane po kolei na każdym chromosomie
-		 */
-		public ArrayList<Mutator> stage2_mutatorsList = new ArrayList<Mutator>();
-
-		/**
-		 * Wielkość populacji - etap trzeci
-		 */
-		public int stage3_populationSize = 500;
-		/**
-		 * Limit iteracji - etap trzeci
-		 */
-		public int stage3_iterationsLimit = 200;
-		/**
-		 * Etap trzeci - lista Mutatorów to mutowania chromosomow - wykonywane po kolei na każdym chromosomie
-		 */
-		public ArrayList<Mutator> stage3_mutatorsList = new ArrayList<Mutator>();
-
-	}
-
-	/**
 	 * Obserwator statystyk wszytskich etapów
 	 * 
 	 * @author Daniel Tyka
@@ -100,14 +52,13 @@ public class StageGraphColoring extends GenericGraphColoring {
 	}
 
 	/**
-	 * Opcje etepów algorytmu
-	 */
-	// protected StageAlgorithmProperties stageProperties = new StageAlgorithmProperties();
-
-	/**
 	 * Licznik iteracji
 	 */
 	protected int iterationsCounter = 0;
+	
+	/**
+	 * Raport z działania algorytmu w postaci listy stringów. Umieszcza w nim wyniki poszczególnych etapów
+	 */
 	private ArrayList<String> raport;
 
 	/**
@@ -137,18 +88,12 @@ public class StageGraphColoring extends GenericGraphColoring {
 		stage1 = new GenericGraphColoring(graph);
 		stage1.addStatsObserver(statsObserver);
 		stage1.addResultObserver(resultObserver);
-		// stage1.setIterationsLimit(stageProperties.stage1_iterationsLimit);
-		// stage1.setPopulationSize(stageProperties.stage1_populationSize);
 		stage2 = new GenericGraphColoring(graph);
 		stage2.addStatsObserver(statsObserver);
 		stage2.addResultObserver(resultObserver);
-		// stage2.setIterationsLimit(stageProperties.stage2_iterationsLimit);
-		// stage2.setPopulationSize(stageProperties.stage2_populationSize);
 		stage3 = new GenericGraphColoring(graph);
 		stage3.addStatsObserver(statsObserver);
 		stage3.addResultObserver(resultObserver);
-		// stage3.setIterationsLimit(stageProperties.stage3_iterationsLimit);
-		// stage3.setPopulationSize(stageProperties.stage3_populationSize);
 	}
 
 	/**
@@ -397,7 +342,6 @@ public class StageGraphColoring extends GenericGraphColoring {
 	public void setStage1_IterationsLimit(int iterationsLimit) {
 		if (iterationsLimit < 0)
 			throw new IllegalArgumentException("iterationsLimit cannot be less than 0.");
-		// stageProperties.stage1_iterationsLimit=iterationsLimit;
 		stage1.setIterationsLimit(iterationsLimit);
 	}
 
@@ -410,7 +354,6 @@ public class StageGraphColoring extends GenericGraphColoring {
 	public void setStage2_IterationsLimit(int iterationsLimit) {
 		if (iterationsLimit < 0)
 			throw new IllegalArgumentException("iterationsLimit cannot be less than 0.");
-		// stageProperties.stage2_iterationsLimit=iterationsLimit;
 		stage2.setIterationsLimit(iterationsLimit);
 	}
 
@@ -423,7 +366,6 @@ public class StageGraphColoring extends GenericGraphColoring {
 	public void setStage3_IterationsLimit(int iterationsLimit) {
 		if (iterationsLimit < 0)
 			throw new IllegalArgumentException("iterationsLimit cannot be less than 0.");
-		// stageProperties.stage3_iterationsLimit=iterationsLimit;
 		stage3.setIterationsLimit(iterationsLimit);
 	}
 
@@ -436,7 +378,6 @@ public class StageGraphColoring extends GenericGraphColoring {
 	public void setStage1_PopulationSize(int populationSize) {
 		if (populationSize < 2)
 			throw new IllegalArgumentException("populationSize cannot be less than 2.");
-		// stageProperties.stage1_populationSize=populationSize;
 		stage1.setPopulationSize(populationSize);
 	}
 
@@ -449,7 +390,6 @@ public class StageGraphColoring extends GenericGraphColoring {
 	public void setStage2_PopulationSize(int populationSize) {
 		if (populationSize < 2)
 			throw new IllegalArgumentException("populationSize cannot be less than 2.");
-		// stageProperties.stage1_populationSize=populationSize;
 		stage1.setPopulationSize(populationSize);
 	}
 
@@ -462,7 +402,6 @@ public class StageGraphColoring extends GenericGraphColoring {
 	public void setStage3_PopulationSize(int populationSize) {
 		if (populationSize < 2)
 			throw new IllegalArgumentException("populationSize cannot be less than 2.");
-		// stageProperties.stage1_populationSize=populationSize;
 		stage1.setPopulationSize(populationSize);
 	}
 

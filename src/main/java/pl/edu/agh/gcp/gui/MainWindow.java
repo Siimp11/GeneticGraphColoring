@@ -33,6 +33,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import pl.edu.agh.gcp.GenericGraphColoring;
 import pl.edu.agh.gcp.GenericGraphColoring.Stats;
+import pl.edu.agh.gcp.StageGraphColoring;
 import pl.edu.agh.gcp.dimacs.DimacsParser;
 import pl.edu.agh.gcp.mutator.ColorUnifier2;
 import pl.edu.agh.gcp.mutator.FixBadEdgesImproved;
@@ -83,7 +84,7 @@ public class MainWindow extends JFrame{
 	/**
 	 * Obiekty związane z algorytmem
 	 */
-	private GenericGraphColoring graphColoring;			//algorytm
+	private StageGraphColoring graphColoring;			//algorytm
 	private DimacsParser parser;						//parser plików dimacs
 	private Graph<Object, Object> currentGraph=null;	//obecnie wyświetlany graf
 	
@@ -161,12 +162,25 @@ public class MainWindow extends JFrame{
 			public void actionPerformed(ActionEvent arg0) {
 				if(currentGraph!=null){
 					clearChartData();
-					graphColoring = new GenericGraphColoring(currentGraph);
-					graphColoring.addMutator(new RandomMutator(35, 100));
-					graphColoring.addMutator(new FixBadEdgesImproved(80, 100));
-					graphColoring.addMutator(new ColorUnifier2(50, 100));
-					graphColoring.setPopulationSize(500);
-					graphColoring.setIterationsLimit(500);
+					graphColoring = new StageGraphColoring(currentGraph);
+					
+					graphColoring.setStage1_PopulationSize(200);
+					graphColoring.setStage1_IterationsLimit(300);
+					graphColoring.addStage1_Mutator(new RandomMutator(40, 100));
+					graphColoring.addStage1_Mutator(new ColorUnifier2(50, 100));
+					
+					graphColoring.setStage2_PopulationSize(100);
+					graphColoring.setStage2_IterationsLimit(200);
+					graphColoring.addStage2_Mutator(new RandomMutator(35, 100));
+					graphColoring.addStage2_Mutator(new FixBadEdgesImproved(80, 100));
+					graphColoring.addStage2_Mutator(new ColorUnifier2(50, 100));
+					
+					graphColoring.setStage3_PopulationSize(500);
+					graphColoring.setStage3_IterationsLimit(500);
+					graphColoring.addStage3_Mutator(new RandomMutator(50, 100));
+					graphColoring.addStage3_Mutator(new FixBadEdgesImproved(70, 100));
+					graphColoring.addStage3_Mutator(new ColorUnifier2(50, 100));
+					
 					graphColoring.setBadEdgeWeight(5);
 					graphColoring.setColorsUsedWeight(2);
 					
@@ -178,6 +192,8 @@ public class MainWindow extends JFrame{
 							
 							System.out.println("Best child found: fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
 									+ " badEdges=" + ch.getBadEdges() + " coloring=" + Arrays.toString(ch.getColoringTab()));
+							for(String s : graphColoring.getRaport())
+								System.out.println(s);
 							
 							JOptionPane.showMessageDialog(contentPane, "fitness=" + ch.getFitness() + " colorsUsed=" + ch.getColors()
 									+ " badEdges=" + ch.getBadEdges(), "Wynik", JOptionPane.INFORMATION_MESSAGE);
@@ -195,7 +211,14 @@ public class MainWindow extends JFrame{
 						}
 					});
 					
-					graphColoring.run();
+					new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							graphColoring.run();
+						}
+					}).start();
+					
 				}
 
 			}
