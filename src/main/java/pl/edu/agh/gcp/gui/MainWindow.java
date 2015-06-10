@@ -86,7 +86,7 @@ public class MainWindow extends JFrame{
 	private JSpinner iterationSpinnerStageThree;
 	
 	/******************/
-	private JPanel bottomMenu;
+	private JPanel resultPanel;
 	private JLabel fitnessLabel;
 	private JLabel colorsLabel;
 	private JLabel badEdgesLabel;
@@ -311,6 +311,28 @@ public class MainWindow extends JFrame{
 		
 		topMenu.add(settingsPanel);
 		
+		/**
+		 * Panel z wynikiem kolorowania
+		 */
+        resultPanel = new JPanel();
+        resultPanel.setLayout(new GridLayout(3,1));
+        
+        fitnessLabel = new JLabel();
+        fitnessLabel.setText(fitnessLabelPrefix);
+        fitnessLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        resultPanel.add(fitnessLabel);
+        
+        colorsLabel = new JLabel();
+        colorsLabel.setText(colorsLabelPrefix);
+        colorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        resultPanel.add(colorsLabel);
+        
+        badEdgesLabel = new JLabel();
+        badEdgesLabel.setText(badEdgesLabelPrefix);
+        badEdgesLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        resultPanel.add(badEdgesLabel);
+        
+        topMenu.add(resultPanel);
 		contentPane.add(topMenu, BorderLayout.NORTH);
 		/**********************************************************************************************************
 		/**
@@ -329,31 +351,8 @@ public class MainWindow extends JFrame{
         chartPanel = createNewChart();
         
         contentPane.add(chartPanel, BorderLayout.EAST);
-        /**********************************************************************************************************
-        /**
-         * Stopka z informacjami
-         */
-        bottomMenu = new JPanel();
-        bottomMenu.setLayout(new GridLayout(3,1));
-        
-        fitnessLabel = new JLabel();
-        fitnessLabel.setText(fitnessLabelPrefix);
-        fitnessLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        bottomMenu.add(fitnessLabel);
-        
-        colorsLabel = new JLabel();
-        colorsLabel.setText(colorsLabelPrefix);
-        colorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        bottomMenu.add(colorsLabel);
-        
-        badEdgesLabel = new JLabel();
-        badEdgesLabel.setText(badEdgesLabelPrefix);
-        badEdgesLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        bottomMenu.add(badEdgesLabel);
-        
-        
-        contentPane.add(bottomMenu, BorderLayout.SOUTH);
         /**********************************************************************************************************/
+		
         pack();
 	}
 	
@@ -407,7 +406,7 @@ public class MainWindow extends JFrame{
 	private static class DefaultVertexPaintTransformer implements Transformer<Object,Paint> {
 		@Override
 		public Paint transform(Object i){
-			return Color.GREEN;
+			return Color.GRAY;
 		}
 	}
 	
