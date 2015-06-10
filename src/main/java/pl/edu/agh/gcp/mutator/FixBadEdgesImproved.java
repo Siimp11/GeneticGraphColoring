@@ -7,12 +7,28 @@ import pl.edu.agh.gcp.population.Chromosome;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Pair;
 
+/**
+ * Usprawniona wersja {@link FixBadEdges}. Stara się użyc już użytych kolorów w chromosomie do naprawy błędu.
+ * @author Daniel Tyka
+ * @version 1.0
+ */
 public class FixBadEdgesImproved extends FixBadEdges implements Mutator {
 
+	/**
+	 * Konstruktor. Szansa na mutacje jest równa <code>chanceNumerator/chanceDenominator</code>.
+	 * 
+	 * @param chanceNumerator
+	 *                licznik
+	 * @param chanceDenominator
+	 *                mianownik
+	 */
 	public FixBadEdgesImproved(int chanceNumerator, int chanceDenominator) {
 		super(chanceNumerator, chanceDenominator);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void mutateFunction(Chromosome chromosome, int colorLimit, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges) {
 		int index1, index2, unusedColorCount, counter, chosenColor;

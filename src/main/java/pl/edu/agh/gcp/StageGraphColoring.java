@@ -16,6 +16,20 @@ import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.populationGenerator.PopulationGenerator;
 import edu.uci.ics.jung.graph.Graph;
 
+/**
+ * Genetyczny algorytm kolorowania wierzchołkowego grafu w trzech etapach:
+ * <ol>
+ * <li>pierwsze przybliżenie - minimalizacja 2 parametrów, znaleznienie jakiegoś pokolorowania</li>
+ * <li>szybkie szukanie rozwiązań - szybkie poszukiwanie lepszych rozwiązań niż w poprzednim etapie; za każdym razem o jeden kolor mniej</li>
+ * <li>dokładne poszukiwanie - dokladniejsze poszukiwanie niż w drugim etapie; większa populacja i ilość iteracji</li>
+ * 
+ * <p>Każdy etap ma swoje własne parametry</p>
+ * <p>Wymaga wierzcholków implementujączych interfejs <b>{@link Comparable}</b></p>
+ * </ol>
+ * @author Daniel Tyka
+ * @version 1.0
+ *
+ */
 public class StageGraphColoring extends GenericGraphColoring {
 
 	/**

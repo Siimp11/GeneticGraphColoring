@@ -8,13 +8,25 @@ import pl.edu.agh.gcp.population.Chromosome;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Pair;
 
+/**
+ * Usprawniona wersja operatora {@link ColourUnifier}. Gwarantuje, że pierwszy wierzcholek bedzie zawsze miał kolor o numerze 0, a każdy następny 
+ * kolor już użyty lub o jeden większy od aktualnego maksymalnego.
+ * @author Daniel Tyka
+ * @version 2.0
+ */
 public class ColorUnifier2 implements Mutator {
 	private Random random = new Random();
+	/**
+	 * Licznik szansy na mutację
+	 */
 	private int chanceNumerator;
+	/**
+	 * Mianownik szansy na mutację
+	 */
 	private int chanceDenominator;
 
 	/**
-	 * Konstruktor. Szansa na mutacje jest równa chanceNumerator/chanceDenominator
+	 * Konstruktor. Szansa na mutacje jest równa <code>chanceNumerator/chanceDenominator</code>
 	 * 
 	 * @param chanceNumerator
 	 *                licznik
@@ -26,6 +38,9 @@ public class ColorUnifier2 implements Mutator {
 		this.chanceDenominator = chanceDenominator;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean mutate(Chromosome chromosome) {
 		if (random.nextInt(chanceDenominator) < chanceNumerator)
@@ -34,6 +49,9 @@ public class ColorUnifier2 implements Mutator {
 			return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void mutateFunction(Chromosome chromosome, int colorLimit, Graph<Object, Object> graph, Object[] vertex, Collection<Object> edges) {
 		int colorCounter=0;

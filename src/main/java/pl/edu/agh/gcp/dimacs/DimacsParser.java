@@ -13,15 +13,33 @@ import edu.uci.ics.jung.graph.UndirectedSparseGraph;
  *
  */
 public class DimacsParser {
+	/**
+	 * Ścieżka do pliku
+	 */
 	private String filename;
+	/**
+	 * Wczytany graf
+	 */
 	private Graph<Object, Object> graph;
+	/**
+	 * Ilość wierzchołków
+	 */
 	private int vertices;
 	
+	/**
+	 * Konstruktor
+	 * @param filename - ścieżka do pliku w formacie DIMACS
+	 */
 	public DimacsParser(String filename) {
 		this.filename = filename;
 		graph = new UndirectedSparseGraph<Object, Object>();
 	}
 	
+	/**
+	 * Parsowanie pliku
+	 * @return wczytany graf
+	 * @throws Exception w przypadku niepoprawnego formatu lub błędu IOException
+	 */
 	public Graph<Object, Object> load() throws Exception{ //TODO IOException
 		if(graph.getVertexCount() != 0) return null;
 		
@@ -45,10 +63,19 @@ public class DimacsParser {
 		return graph;
 	}
 	
+	/**
+	 * Zwraca wczytany graf
+	 * @return graf
+	 */
 	public Graph<Object, Object> getGraph() {
 		return graph;
 	}
 	
+	/**
+	 * Parsuje linię z pliku
+	 * @param linia z pliku
+	 * @throws Exception
+	 */
 	private void parseLine(String line) throws Exception{
 		if(line.charAt(0) == 'c') return;
 		else if(line.charAt(0) == 'p') {

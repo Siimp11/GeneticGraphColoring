@@ -1,5 +1,5 @@
 /**
- * Pakiet z klasami do wybierania rodziców z populacji do generowania poromków
+ * Pakiet z operatorami do wybierania rodziców z populacji do generowania poromków
  * @author Daniel Tyka
  * @version 1.0
  *

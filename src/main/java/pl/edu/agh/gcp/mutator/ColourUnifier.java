@@ -20,11 +20,17 @@ import edu.uci.ics.jung.graph.Graph;
  */
 public class ColourUnifier implements Mutator {
 	private Random random = new Random();
+	/**
+	 * Licznik szansy na mutację
+	 */
 	private int chanceNumerator;
+	/**
+	 * Mianownik szansy na mutację
+	 */
 	private int chanceDenominator;
 	
 	/**
-	 * Konstruktor. Szansa na mutacje jest równa chanceNumerator/chanceDenominator
+	 * Konstruktor. Szansa na mutacje jest równa <code>chanceNumerator/chanceDenominator</code>
 	 * @param chanceNumerator licznik
 	 * @param chanceDenominator mianownik
 	 */

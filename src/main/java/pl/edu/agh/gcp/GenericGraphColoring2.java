@@ -7,10 +7,25 @@ import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 import edu.uci.ics.jung.graph.Graph;
 
+/**
+ * Generyczny algorytm kolorowania grafu. Wymaga wierzcholków implementujączych interfejs <b>{@link Comparable}</b>
+ * <p>Nie generuje za każdym razem nowej populacji. Wybiera losową liczbę z rozkładu normalnego; wszystkie osobniki z przystosowaniem 
+ * powyżej tej liczby są odrzucane i zastępowane wygenerowanymi potomkami</p>
+ * @author Daniel Tyka
+ * @version 1.0
+ *
+ */
 public class GenericGraphColoring2 extends GenericGraphColoring {
+	/**
+	 * Tymczasowa populacja do przechowywania rodziców
+	 */
 	private Population parents = null;
 	private Random random = new Random();
 
+	/**
+	 * Konstruktor
+	 * @param graf do pokolorowania
+	 */
 	public GenericGraphColoring2(Graph<Object, Object> graph) {
 		super(graph);
 	}
@@ -65,6 +80,10 @@ public class GenericGraphColoring2 extends GenericGraphColoring {
 		}
 	}
 
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void mutate() {
 		super.mutate();

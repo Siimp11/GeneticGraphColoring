@@ -43,6 +43,9 @@ public class Population implements Iterable<Chromosome> {
     	population = new ArrayList<Chromosome>(size);
     }
     
+    /**
+     * Konstruktor
+     */
     public Population(){
     	population=new ArrayList<Chromosome>();
     }

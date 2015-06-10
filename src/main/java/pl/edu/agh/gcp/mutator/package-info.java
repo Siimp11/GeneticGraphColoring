@@ -1,5 +1,5 @@
 /**
- * Pakiet z Mutatorami - klasami wykonującymi mutację na podanym chromosomie
+ * Pakiet z Mutatorami - operatorami mutaci na podanym chromosomie
  * @author Daniel Tyka
  * @version 1.0
  *

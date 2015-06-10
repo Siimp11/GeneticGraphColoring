@@ -5,9 +5,18 @@ import java.util.Random;
 import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 
+/**
+ * Generuje całkowicie losową populację startową
+ * @author Daniel Tyka
+ * @version 1.0
+ *
+ */
 public class RandomPopulation implements PopulationGenerator {
 	private Random random = new Random();
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Population generatePopulation(int populationSize, int chromosomeSize, int colorLimit) {
 		Population population = new Population(populationSize);

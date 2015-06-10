@@ -25,8 +25,8 @@ import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 import pl.edu.agh.gcp.populationGenerator.PopulationGenerator;
 import pl.edu.agh.gcp.populationGenerator.RandomPopulation;
-import pl.edu.agh.gcp.resultSelector.DefaultResultSelector;
-import pl.edu.agh.gcp.resultSelector.BestResultSelector;
+import pl.edu.agh.gcp.resultSelector.BeshResultSelector;
+import pl.edu.agh.gcp.resultSelector.ResultSelector;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Pair;
 
@@ -140,7 +140,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 		/**
 		 * ResultSelector do wybierania wyniku
 		 */
-		public BestResultSelector resultSelector = new DefaultResultSelector();
+		public ResultSelector resultSelector = new BeshResultSelector();
 		/**
 		 * Generator populacji startowej
 		 */

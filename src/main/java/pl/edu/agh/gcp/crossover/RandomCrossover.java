@@ -4,9 +4,17 @@ import java.util.Random;
 
 import pl.edu.agh.gcp.population.Chromosome;
 
+/**
+ * Operator krzyżowania w którym poszczególne geny są brane losowo z pierwszego lub drugiego rodzica
+ * @author Daniel Tyka
+ *
+ */
 public class RandomCrossover implements Crossover {
 	private Random random = new Random();
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Chromosome crossoverFunction(Chromosome parent1, Chromosome parent2) {
 		Chromosome child = new Chromosome(parent1.size());

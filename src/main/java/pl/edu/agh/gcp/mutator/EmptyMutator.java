@@ -6,7 +6,7 @@ import pl.edu.agh.gcp.population.Chromosome;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
- * Pusta implementacja Mutatora
+ * Pusta implementacja Mutatora. Szansa na mutację równa 0%. Pusta implementacja funkcji mutującej.
  * @author Daniel Tyka
  * @version 1.0
  *

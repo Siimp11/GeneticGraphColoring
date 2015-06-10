@@ -4,12 +4,12 @@ import pl.edu.agh.gcp.population.Chromosome;
 import pl.edu.agh.gcp.population.Population;
 
 /**
- * Domyślna implementacja wybierania wynikoweg Chromosomu z populacji
+ * Domyślna implementacja wybierania wynikoweg Chromosomu z populacji - wybiera najlepszy chromosom który nie ma błędów
  * @author Daniel Tyka
  * @version 1.0
  *
  */
-public class DefaultResultSelector implements BestResultSelector {
+public class BeshResultSelector implements ResultSelector {
 
     /**
      * {@inheritDoc}

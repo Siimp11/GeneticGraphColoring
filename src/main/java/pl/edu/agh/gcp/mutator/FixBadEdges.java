@@ -15,11 +15,17 @@ import edu.uci.ics.jung.graph.util.Pair;
  */
 public class FixBadEdges implements Mutator {
 	protected Random random = new Random();
+	/**
+	 * Licznik szansy na mutację
+	 */
 	protected int chanceNumerator;
+	/**
+	 * Mianownik szansy na mutację
+	 */
 	protected int chanceDenominator;
 
 	/**
-	 * Konstruktor. Szansa na mutacje chromosomu z błędami jest równa chanceNumerator/chanceDenominator
+	 * Konstruktor. Szansa na mutacje chromosomu z błędami jest równa <codee>chanceNumerator/chanceDenominator</code>
 	 * 
 	 * @param chanceNumerator
 	 *                licznik

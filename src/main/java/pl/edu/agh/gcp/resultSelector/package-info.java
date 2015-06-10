@@ -1,5 +1,5 @@
 /**
- * Pakiet z klasami do wybierania wyniku z populacji
+ * Pakiet z operatorami do wybierania wyniku z populacji
  * @author Daniel Tyka
  * @version 1.0
  *
