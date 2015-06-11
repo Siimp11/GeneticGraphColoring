@@ -28,8 +28,8 @@ public class RandomMutator implements Mutator {
 	private int chanceDenominator;
 
 	/**
-	 * Konstruktor. Szansa na mutacje jest równa <code>chanceNumerator/chanceDenominator</code>.<br/>
-	 * <code>ilość zmian = długość_chromosomu/changesDiv</code>   -> zaokrąglana w górę
+	 * Konstruktor. Szansa na mutacje jest równa <code>chanceNumerator/chanceDenominator</code>.<br>
+	 * <code>ilość zmian = długość_chromosomu/changesDiv</code>   -&gt; zaokrąglana w górę
 	 * 
 	 * @param chanceNumerator
 	 *                licznik

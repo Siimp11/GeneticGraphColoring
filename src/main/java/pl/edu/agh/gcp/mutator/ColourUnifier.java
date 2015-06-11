@@ -11,7 +11,7 @@ import edu.uci.ics.jung.graph.Graph;
  * Mutator modyfikujący zakres wykorzystanych kolorów. Nie wpływa na ilość
  * błędnie pokolorowanych wierzchołków, jedynie zastępuje obecnie stosowane
  * kolory nowymi, w taki sposób, że dla grafu pokolorowanego przy pomocy k
- * kolorów, będą one mieściły się w zbiorze <0,k-1>. Relacja większy-mniejszy
+ * kolorów, będą one mieściły się w zbiorze &lt;0,k-1&gt;. Relacja większy-mniejszy
  * pomiędzy wartościami kolorów zostaje zachowana.
  * Ważne: jest thread-safe. Jedna instancja tej klasy może być jednocześnie wykorzystywane w wielu wątkach bez konieczności synchronizacji.
  * 

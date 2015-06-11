@@ -24,7 +24,7 @@ public class GenericGraphColoring2 extends GenericGraphColoring {
 
 	/**
 	 * Konstruktor
-	 * @param graf do pokolorowania
+	 * @param graph - graf do pokolorowania
 	 */
 	public GenericGraphColoring2(Graph<Object, Object> graph) {
 		super(graph);

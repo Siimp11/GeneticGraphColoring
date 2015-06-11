@@ -9,7 +9,7 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Pair;
 
 /**
- * Mutator który naprawia błędy w chromosomie. Zmienia kolory na końcu błędnej krawędzi na taki który jest dostępny -> nie powoduje błędów
+ * Mutator który naprawia błędy w chromosomie. Zmienia kolory na końcu błędnej krawędzi na taki który jest dostępny -&gt; nie powoduje błędów
  * @author Daniel Tyka
  * @version 1.0
  */
@@ -25,7 +25,7 @@ public class FixBadEdges implements Mutator {
 	protected int chanceDenominator;
 
 	/**
-	 * Konstruktor. Szansa na mutacje chromosomu z błędami jest równa <codee>chanceNumerator/chanceDenominator</code>
+	 * Konstruktor. Szansa na mutacje chromosomu z błędami jest równa <code>chanceNumerator/chanceDenominator</code>
 	 * 
 	 * @param chanceNumerator
 	 *                licznik

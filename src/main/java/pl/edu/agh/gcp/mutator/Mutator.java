@@ -17,7 +17,7 @@ public interface Mutator {
      * Czy wykonać mutację danego chromosomu. 
      * <p>W tym momencie chromosom ma już policzone wartości Fitness, Colors oraz BadEdges<p>
      * 
-     * @param chromosom
+     * @param chromosome
      *            na którym ma być wykonana mutacja
      * @return true or false
      */
@@ -34,6 +34,8 @@ public interface Mutator {
      * 
      * @param chromosome
      *            - chromosom do mutacji
+     * @param colorLimit
+     * 		  - limit kolorów
      * @param graph
      *            - graf na którym działa algorytm
      * @param vertex

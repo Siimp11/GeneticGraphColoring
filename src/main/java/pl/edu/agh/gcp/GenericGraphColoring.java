@@ -155,7 +155,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	protected static class ObservableResult extends Observable{
 		/**
 		 * Ustawia wynik algorytmu i powiadamia obserwatorów
-		 * @param wynik
+		 * @param result - wynik
 		 */
 		public void setResult(Chromosome result){
 			setChanged();
@@ -172,7 +172,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	protected static class ObservableStats extends Observable{
 		/**
 		 * Ustawia statystyki i informuje obserwujących
-		 * @param statystyki
+		 * @param stats - statystyki
 		 */
 		public void setStats(Stats stats){
 			setChanged();
@@ -706,7 +706,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	
 	/**
 	 * Dodaje obserwatora wyniku
-	 * @param obserwator
+	 * @param observer - obserwator
 	 */
 	public void addResultObserver(Observer observer){
 		observableResult.addObserver(observer);
@@ -714,7 +714,7 @@ public class GenericGraphColoring extends DefaultGeneticAlgorithm {
 	
 	/**
 	 * Dodaje obserwatora statystyk
-	 * @param obserwator
+	 * @param observer - obserwator
 	 */
 	public void addStatsObserver(Observer observer){
 		observableStats.addObserver(observer);

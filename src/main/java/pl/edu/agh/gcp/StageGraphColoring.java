@@ -22,10 +22,10 @@ import edu.uci.ics.jung.graph.Graph;
  * <li>pierwsze przybliżenie - minimalizacja 2 parametrów, znaleznienie jakiegoś pokolorowania</li>
  * <li>szybkie szukanie rozwiązań - szybkie poszukiwanie lepszych rozwiązań niż w poprzednim etapie; za każdym razem o jeden kolor mniej</li>
  * <li>dokładne poszukiwanie - dokladniejsze poszukiwanie niż w drugim etapie; większa populacja i ilość iteracji</li>
- * 
+ * </ol>
  * <p>Każdy etap ma swoje własne parametry</p>
  * <p>Wymaga wierzcholków implementujączych interfejs <b>{@link Comparable}</b></p>
- * </ol>
+ * 
  * @author Daniel Tyka
  * @version 1.0
  *
@@ -332,7 +332,7 @@ public class StageGraphColoring extends GenericGraphColoring {
 	/**
 	 * Dodaje obserwatora wyniku
 	 * 
-	 * @param obserwator
+	 * @param observer - obserwator
 	 */
 	public void addResultObserver(Observer observer) {
 		observableResult.addObserver(observer);
@@ -341,7 +341,7 @@ public class StageGraphColoring extends GenericGraphColoring {
 	/**
 	 * Dodaje obserwatora statystyk
 	 * 
-	 * @param obserwator
+	 * @param observer - obserwator
 	 */
 	public void addStatsObserver(Observer observer) {
 		observableStats.addObserver(observer);

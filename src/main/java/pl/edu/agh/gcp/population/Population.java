@@ -26,7 +26,7 @@ public class Population implements Iterable<Chromosome> {
 
     /**
      * Konstruktor na podstawie kolekcji chromosomów
-     * @param chromosomy
+     * @param chromosomes - chromosomy
      */
     public Population(Collection<Chromosome> chromosomes){
     	population = new ArrayList<Chromosome>();
@@ -52,7 +52,7 @@ public class Population implements Iterable<Chromosome> {
 
     /**
      * Dodaj chromosom do populacji
-     * @param chromosom
+     * @param chromosome - chormosom
      */
     public void add(Chromosome chromosome) {
     	population.add(chromosome);
